@@ -226,7 +226,7 @@ class FactorBacktest:
 
             tqdm_obj = tqdm(
                 total=len(self.factor_list),
-                desc=f'>>> Analyzing factors')
+                desc='>>> Analyzing factors')
 
             for factor in self.factor_list:
                 p = Process(target=_analyze_shared,

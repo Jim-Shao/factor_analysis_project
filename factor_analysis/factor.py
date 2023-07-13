@@ -326,7 +326,9 @@ class Factor:
 
             year_IC = IC_series.groupby(
                 IC_series.index.year).apply(get_IC_summary)
+            year_IC = year_IC.reset_index(level=1, drop=True)
             total_IC = get_IC_summary(IC_series)
+            total_IC.index = ['total']
 
             IC_summary_df = pd.concat([total_IC, year_IC], axis=0).T
             IC_summary_df_dict[period] = IC_summary_df
