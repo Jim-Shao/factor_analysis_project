@@ -362,8 +362,8 @@ class Factor:
             period_int = int(period[:-1])
 
             groups = group_returns.columns.to_list()
-            # [group1], [group_last, long_excess, short_excess, long_short]
-            target_groups = [groups[0]] + groups[-5:]
+            # [group_last, group1], [long_excess, short_excess, long_short]
+            target_groups = [groups[-5], groups[0]] + groups[-4:]
 
             performance_dict_list = []
             for group in target_groups:
@@ -373,6 +373,8 @@ class Factor:
                     group_series.values).performance()
                 performance_dict_list.append(performance_dict)
 
+            target_groups[0] = f'{target_groups[0]}(long)'
+            target_groups[1] = f'{target_groups[1]}(short)'
             performance_df = pd.DataFrame(performance_dict_list,
                                           index=target_groups,
                                           columns=performance_dict.keys())
@@ -497,7 +499,8 @@ class Factor:
                 'turnover_mean': turnover.mean(),
                 'turnover_std': turnover.std()
             })
-        turnover_table = pd.DataFrame(turnover_dict_list)
+        turnover_table = pd.DataFrame(turnover_dict_list).set_index('group')
+        turnover_table.index.name = None
         self.turnover_table = turnover_table
 
     def make_factor_weighted_turnover_table(self):
