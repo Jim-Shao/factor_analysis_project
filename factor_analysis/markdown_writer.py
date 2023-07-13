@@ -95,7 +95,7 @@ class MarkdownWriter:
             表格数据
         """
         with open(self.md_path, "a", encoding="utf-8") as f:
-            f.write(df.to_markdown(floatfmt=float_format) + "\n")
+            f.write(df.to_markdown(floatfmt=float_format) + "\n\n")
 
     def add_image(self, image_name: str, image_path: str):
         """

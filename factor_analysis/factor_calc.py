@@ -522,7 +522,8 @@ class CalcPool:
     def calc_factors(self) -> pd.DataFrame:
         """计算因子（单进程或多进程）"""
         if self.n_jobs == 1:
-            for factor_name, expression in tqdm(self.expressions.items()):
+            for factor_name, expression in tqdm(self.expressions.items(), desc=
+                                                '>>> Calculating factors'):
                 self._calc_factor(self.name_space, factor_name, expression)
         else:
             processes: List[Process] = []  # 进程列表，用于存储正在运行的进程

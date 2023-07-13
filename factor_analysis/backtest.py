@@ -214,7 +214,7 @@ class FactorBacktest:
     def analyze_factors(self) -> None:
         """分析所有因子"""
         if self.n_jobs == 1:
-            for factor in tqdm(self.factor_list):
+            for factor in tqdm(self.factor_list, desc='>>> Analyzing factors'):
                 factor.analyze()
         else:
             processes: List[Process] = []  # 进程列表，用于存储正在运行的进程
@@ -223,7 +223,7 @@ class FactorBacktest:
 
             tqdm_obj = tqdm(
                 total=len(self.factor_list),
-                desc=f'>>> Analyzing factors (n_jobs={self.n_jobs})')
+                desc=f'>>> Analyzing factors')
 
             for factor in self.factor_list:
                 p = Process(target=_analyze_shared,
@@ -287,6 +287,16 @@ class FactorBacktest:
         else:
             factor_df = self.factor_df.copy()
 
+        # 得到单因子的超额收益表现
+        old_sharpe_list = [
+            factor.quantile_return_performance.loc['excess',
+                                                    'annual_sharpe']
+            for factor in self.factor_list
+        ]
+        old_best = np.argmax(old_sharpe_list)
+        old_best_combination = self.factor_list[old_best]
+        old_best_sharpe = old_sharpe_list[old_best]
+
         # 两两组合
         factor_combinations = list(combinations(factor_names, 2))
 
@@ -309,18 +319,9 @@ class FactorBacktest:
 
         # 分析优化因子（不需要分层回测和计算IC，只需要查看前quantile组的超额收益表现）
         if self.n_jobs == 1:
-            for factor in tqdm(factor_list):
+            for factor in tqdm(factor_list, desc='Combining 2 factors'):
                 factor.analyze_quantile()
         else:
-            # 得到单因子的超额收益表现
-            old_sharpe_list = [
-                factor.quantile_return_performance.loc['excess',
-                                                       'annual_sharpe']
-                for factor in self.factor_list
-            ]
-            old_best = np.argmax(old_sharpe_list)
-            old_best_combination = self.factor_list[old_best]
-            old_best_sharpe = old_sharpe_list[old_best]
             print(
                 f'(n=1) Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})'
             )
@@ -333,7 +334,7 @@ class FactorBacktest:
             shared_factor_list = manager.list()
 
             tqdm_obj = tqdm(total=len(factor_list),
-                            desc=f'Combining 2 factors')
+                            desc='Combining 2 factors')
 
             for factor in factor_list:
                 p = Process(target=_analyze_quantile_shared,
@@ -399,7 +400,7 @@ class FactorBacktest:
 
             # 对新组合的因子进行分析
             if self.n_jobs == 1:
-                for factor in tqdm(factor_list):
+                for factor in tqdm(factor_list, desc=f'Combining {n} factors'):
                     factor.analyze_quantile()
             else:
                 processes: List[Process] = []

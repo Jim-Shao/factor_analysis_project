@@ -44,7 +44,7 @@
     ```shell
     conda activate factor_analysis
     ```
-    安装第三方依赖
+    安装第三方依赖（该步骤受到网络环境影响，可能会失败，建议多尝试几次）
     ```shell
     python setup.py develop
     ```

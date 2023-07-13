@@ -4,8 +4,6 @@
 @Author  :   shaoshijie
 @File    :   postprocess.py
 @Description    :   去极值、标准化、归一化、中性化等
-参考https://zhuanlan.zhihu.com/p/37190373
-参考https://zhuanlan.zhihu.com/p/624094435
 '''
 
 import pandas as pd
