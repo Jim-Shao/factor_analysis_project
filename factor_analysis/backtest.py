@@ -146,6 +146,7 @@ class FactorBacktest:
             是否尝试优化，如果为True，则会尝试将已有因子进行相加组合，以寻找更好的因子，如果为False，则不会进行优化，默认为True
         """
         print(f'\n{"*"*30} Factor Analysis (n_jobs={self.n_jobs}) {"*"*30}')
+        start = time.time()
         if self.factor_expressions:
             self.calc_factors()  # 计算因子
         self.calc_forward_returns()  # 计算前瞻收益
@@ -169,6 +170,8 @@ class FactorBacktest:
         if try_optimize is True:
             self.optimize_combination()  # 优化因子组合
         print(f">>> Output directory: {self.output_dir}")
+        end = time.time()
+        print(f">>> Total time for running: {end-start:.2f}s")
 
     @property
     def factor_df(self) -> pd.DataFrame:
