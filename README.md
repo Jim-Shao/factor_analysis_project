@@ -1,7 +1,9 @@
 # factor_analysis 因子回测报告生成工具
 
 ## 1. 介绍
-该工具用于生成Markdown格式的因子回测报告，主要包括以下功能：
+该工具用于生成Markdown格式的因子回测报告（[点击查看示例报告](/factor_analysis_output/factor1/factor1_report.md)）
+
+功能：
 1. 因子多周期IC分析
 2. 因子收益分析（分层、因子值加权、指定quantile组）
 3. 因子换手率分析
