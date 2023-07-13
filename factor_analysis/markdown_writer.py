@@ -31,7 +31,9 @@ def get_relative_path(path_a, path_b) -> str:
         relative_path = os.path.relpath(path_b, common_prefix)
     else:
         relative_path = path_b
-
+    # 对于windows系统，将路径中的反斜杠替换为正斜杠
+    if os.name == "nt":
+        relative_path = relative_path.replace("\\", "/")
     return relative_path
 
 
