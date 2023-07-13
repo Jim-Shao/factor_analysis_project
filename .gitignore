@@ -1,0 +1,9 @@
+#root
+__pycache__/
+*.egg-info/
+factor_analysis_output
+*.feather
+*.csv
+
+#others
+*.log
