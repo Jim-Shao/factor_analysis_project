@@ -63,6 +63,8 @@
 
 ## 4. 其他
 
-1. 多进程模式在windows下运行会出现异常（单进程模式正常），建议在linux下运行多进程模式
+1. 回测对于传入的数据格式有一定要求，主要在于pd.DataFrame或pd.Series的索引为
+```MultiIndex['datetime'(level=0, DatetimeIndex), 'order_book_id'(level=1, Index)]```
+2. 多进程模式在windows下运行会出现异常（单进程模式正常），建议在linux下运行多进程模式
 
 
