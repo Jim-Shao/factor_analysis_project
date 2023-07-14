@@ -24,7 +24,7 @@ if __name__ == '__main__':
     trade_dates['year'] = trade_dates['datetime'].dt.year
     trade_dates['month'] = trade_dates['datetime'].dt.month
     position_dates = trade_dates.groupby(['year', 'month']).last()
-    position_dates = trade_dates['datetime'].tolist()
+    position_dates = position_dates['datetime'].tolist()
 
     # 需要计算的因子
     expression1 = '(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))'
