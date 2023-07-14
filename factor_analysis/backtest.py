@@ -60,7 +60,7 @@ class FactorBacktest:
         Parameters
         ----------
         bar_df : pd.DataFrame
-            行情数据，multi-index[datetime, order_book_id]，columns=['open', 'high', 'low', 'close', 'volume', ...]
+            <后复权>行情数据，multi-index[datetime, order_book_id]，columns=['open', 'high', 'low', 'close', 'volume', ...]
             其中除必须包含的开高低收量之外，还可以包含其他任意列，这些列都可用于用于计算因子
         factor_df : pd.DataFrame, optional
             因子数据，multi-index[datetime, symbol]，columns=['factor1', 'factor2', ...]，默认为None，但是不能和factor_expressions同时为None
@@ -275,8 +275,8 @@ class FactorBacktest:
         if len(factor_names) == 1:
             print(">>> Only one factor, skip optimizing factor combination")
             return
-
-        print(f">>> Optimizing factor combination:")
+        print(">>> Optimizing factor combination:")
+        
         # 截面标准化，使得不同因子在截面上具有可加性
         factor_addable = False
         for postprocess in self.postprocess_queue.queue:
@@ -292,13 +292,15 @@ class FactorBacktest:
 
         # 得到单因子的超额收益表现
         old_sharpe_list = [
-            factor.quantile_return_performance.loc['excess',
-                                                    'annual_sharpe']
+            factor.quantile_return_performance.loc['excess', 'annual_sharpe']
             for factor in self.factor_list
         ]
         old_best = np.argmax(old_sharpe_list)
         old_best_combination = self.factor_list[old_best]
         old_best_sharpe = old_sharpe_list[old_best]
+        print(
+            f'(n=1) Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})'
+        )
 
         # 两两组合
         factor_combinations = list(combinations(factor_names, 2))
@@ -325,10 +327,6 @@ class FactorBacktest:
             for factor in tqdm(factor_list, desc='Combining 2 factors'):
                 factor.analyze_quantile()
         else:
-            print(
-                f'(n=1) Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})'
-            )
-
             processes: List[Process] = []  # 进程列表，用于存储正在运行的进程
             queue = Queue()  # 进程队列，用于存储已完成的进程
 
@@ -376,10 +374,17 @@ class FactorBacktest:
         # 比较两两组合的因子的超额收益表现与单因子的超额收益表现
         if best_sharpe > max(old_sharpe_list):
             print(f"(n=2) Best Sharpe: {best_sharpe:.4f} {best_combination}")
+            is_improved = True
         else:
             print(
                 f"(n=2) No improvement, Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})"
             )
+            best_combination = old_best_combination.name
+            best_sharpe = old_best_sharpe
+            is_improved = False
+
+        if not is_improved:
+            return
 
         factor_list: List[Factor] = []
 
@@ -387,7 +392,7 @@ class FactorBacktest:
         rest_factor_names = list(set(factor_names) - set(best_combination))
         for n in range(3, len(self.factor_list) + 1):
             for factor_name in rest_factor_names:
-                combination = list(best_combination + (factor_name, ))
+                combination = list(best_combination) + [factor_name]
                 factor_combination = sum(
                     [factor_df[factor] for factor in combination])
                 factor = Factor(
@@ -448,8 +453,8 @@ class FactorBacktest:
             # 如果新组合的因子的超额收益表现优于当前最优组合的因子的超额收益表现，则更新最优组合
             if sharpe_list[best_sharpe_idx] > best_sharpe:
                 best_sharpe = sharpe_list[best_sharpe_idx]
-                best_combination = list(best_combination + (
-                    rest_factor_names.pop(best_sharpe_idx), ))
+                best_combination = tuple(best_combination) + (
+                    rest_factor_names.pop(best_sharpe_idx), )
                 print(
                     f"(n={n}) Best Sharpe: {best_sharpe:.4f} {best_combination}"
                 )
@@ -474,3 +479,4 @@ class FactorBacktest:
             position_adjust_datetimes=self.position_adjust_datetimes,
         )
         factor.analyze()
+    

@@ -229,6 +229,7 @@ class Factor:
             axis=1) / total_value_adjusted.sum(axis=1)
         factor_weighted_turnover = factor_weighted_turnover.to_frame()
         factor_weighted_turnover.columns = ['turnover']
+        factor_weighted_turnover /= 2
         factor_weighted_turnover.loc[self.position_adjust_datetimes[0],
                                      'turnover'] = 1
         self.factor_weighted_turnover = factor_weighted_turnover
@@ -249,6 +250,7 @@ class Factor:
             axis=1) / total_value_adjusted.sum(axis=1)
         quantile_turnover = quantile_turnover.to_frame()
         quantile_turnover.columns = ['turnover']
+        quantile_turnover /= 2
         quantile_turnover.loc[self.position_adjust_datetimes[0],
                               'turnover'] = 1
         self.quantile_turnover = quantile_turnover
@@ -548,14 +550,27 @@ class Factor:
         """绘制因子加权持仓换手率图"""
         output_dir = f'{self.output_dir}/turnover'
         os.makedirs(output_dir, exist_ok=True)
-        plot_turnover(self.factor_weighted_turnover, output_dir,
+        daily_factor_weighted_turnover = pd.DataFrame(index=self.trading_dates,
+                                                      columns=['turnover'])
+        daily_factor_weighted_turnover.loc[
+            self.position_adjust_datetimes, 'turnover'] = self.factor_weighted_turnover[
+                'turnover']
+        daily_factor_weighted_turnover = daily_factor_weighted_turnover.fillna(
+            0)
+        plot_turnover(daily_factor_weighted_turnover, output_dir,
                       f'{self.name}_factor_weighted')
 
     def plot_quantile_turnover(self):
         """绘制分位数持仓换手率图"""
         output_dir = f'{self.output_dir}/turnover'
         os.makedirs(output_dir, exist_ok=True)
-        plot_turnover(self.quantile_turnover, output_dir,
+        daily_quantile_turnover = pd.DataFrame(index=self.trading_dates,
+                                               columns=['turnover'])
+        daily_quantile_turnover.loc[
+            self.position_adjust_datetimes, 'turnover'] = self.quantile_turnover[
+                'turnover']
+        daily_quantile_turnover = daily_quantile_turnover.fillna(0)
+        plot_turnover(daily_quantile_turnover, output_dir,
                       f'{self.name}_quantile')
 
     def plot_turnover(self):
