@@ -116,9 +116,6 @@ class Factor:
         self.plot_turnover()
         self.report_turnover()
 
-        # 渲染markdown为pdf
-        self.md_writer.to_pdf(f'{self.output_dir}/{self.name}_report.pdf')
-
     def analyze_quantile(self) -> None:
         """因子分位数超额收益分析"""
         self.calc_periodic_net_values()

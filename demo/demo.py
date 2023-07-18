@@ -47,7 +47,7 @@ if __name__ == '__main__':
         factor_df=stock_bar_df[['open']] + 1,  # 计算好的因子数据，可直接传入
         factor_expressions=expressions,  # 需要计算的因子表达式
         benchmark_df=benchmark_df,  # 基准数据
-        forward_periods=[1, 5, 10],  # 预测未来收益的时间跨度
+        forward_periods=[1, 5, 20],  # 预测未来收益的时间跨度
         position_adjust_datetimes=position_dates,  # 调仓日期
         postprocess_queue=postprocess_queue,  # 因子后处理
         output_dir=None,  # 回测结果输出路径
