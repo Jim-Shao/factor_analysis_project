@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from multiprocessing import Manager, Process, Queue
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Tuple
 from tqdm import tqdm
 from itertools import combinations
 
@@ -51,6 +51,7 @@ class FactorBacktest:
         forward_periods: Union[int, List[int]] = [1, 5, 20],
         position_adjust_datetimes: List[pd.Timestamp] = None,
         postprocess_queue: PostprocessQueue = None,
+        choice: Union[Tuple[float, float], int] = (0.8, 1.0),
         output_dir: str = None,
         n_groups: int = 5,
         n_jobs: int = 1,
@@ -79,6 +80,10 @@ class FactorBacktest:
             可以在当调仓日为某些特定时刻时使用，比如每年的财务日：每年4月、8月、10月最后一天；
         postprocess_queue : PostprocessQueue, optional
             后处理队列，用于对因子数据进行后处理，默认为None，表示不进行后处理
+        choice : Union[Tuple[float, float], int], optional
+            用于单因子回测的分位数选择，可以是一个元组，也可以是一个整数，默认为(0.8, 1.0)；
+            例：(0.8, 1,0)即为每次换仓时，选择因子值处于80%~100%分位数的股票等权买入作为多头；
+            当为整数时，表示每次换仓时，选择因子值处于前choice名的股票等权买入作为多头；
         output_dir : str, optional
             回测结果输出目录，默认为None，表示在当前目录下创建一个factor_analysis_output文件夹
         n_groups : int, optional
@@ -94,6 +99,7 @@ class FactorBacktest:
         self.n_groups = n_groups
         self.n_jobs = n_jobs
         self.postprocess_queue = postprocess_queue
+        self.choice = choice
 
         # 检验调仓日是否全都为交易日
         if position_adjust_datetimes is not None:
@@ -161,6 +167,7 @@ class FactorBacktest:
                 n_group=self.n_groups,
                 output_dir=self.output_dir,
                 position_adjust_datetimes=self.position_adjust_datetimes,
+                quantile=self.choice,
             )
             self.factor_list.append(factor)
         self.analyze_factors()  # 分析因子
@@ -224,9 +231,8 @@ class FactorBacktest:
             queue = Queue()  # 进程队列，用于存储已完成的进程
             shared_factor_list = Manager().list()  # 用于多进程的共享变量
 
-            tqdm_obj = tqdm(
-                total=len(self.factor_list),
-                desc='>>> Analyzing factors')
+            tqdm_obj = tqdm(total=len(self.factor_list),
+                            desc='>>> Analyzing factors')
 
             for factor in self.factor_list:
                 p = Process(target=_analyze_shared,
@@ -276,7 +282,7 @@ class FactorBacktest:
             print(">>> Only one factor, skip optimizing factor combination")
             return
         print(">>> Optimizing factor combination:")
-        
+
         # 截面标准化，使得不同因子在截面上具有可加性
         factor_addable = False
         for postprocess in self.postprocess_queue.queue:
@@ -334,8 +340,7 @@ class FactorBacktest:
             manager = Manager()
             shared_factor_list = manager.list()
 
-            tqdm_obj = tqdm(total=len(factor_list),
-                            desc='Combining 2 factors')
+            tqdm_obj = tqdm(total=len(factor_list), desc='Combining 2 factors')
 
             for factor in factor_list:
                 p = Process(target=_analyze_quantile_shared,
@@ -479,4 +484,3 @@ class FactorBacktest:
             position_adjust_datetimes=self.position_adjust_datetimes,
         )
         factor.analyze()
-    

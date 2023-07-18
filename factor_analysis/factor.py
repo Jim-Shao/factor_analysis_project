@@ -8,8 +8,9 @@
 
 import os
 import pandas as pd
+import numpy as np
 
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Union
 
 from factor_analysis.performance import ReturnPerformance
 from factor_analysis.markdown_writer import MarkdownWriter
@@ -19,15 +20,15 @@ from factor_analysis.plot import plot_net_value, plot_ic_series, plot_turnover
 
 class Factor:
     def __init__(
-            self,
-            name: str,
-            factor_series: pd.Series,
-            forward_return_df: pd.DataFrame,
-            bench_forward_return_df: pd.DataFrame,
-            n_group: int = 5,
-            output_dir: str = None,
-            position_adjust_datetimes: List[pd.Timestamp] = None,
-            quantile: Tuple[float, float] = (0.8, 1.0),
+        self,
+        name: str,
+        factor_series: pd.Series,
+        forward_return_df: pd.DataFrame,
+        bench_forward_return_df: pd.DataFrame,
+        position_adjust_datetimes: List[pd.Timestamp] = None,
+        n_group: int = 5,
+        quantile: Union[Tuple[float, float], int] = (0.8, 1.0),
+        output_dir: str = None,
     ) -> None:
         """因子分析类
 
@@ -41,14 +42,16 @@ class Factor:
             前瞻收益序列，multi-index[datetime, order_book_id]，columns如['1D', '5D', '10D',...]
         bench_forward_return_df : pd.DataFrame
             基准前瞻收益序列，multi-index[datetime, order_book_id]，columns如['1D', '5D', '10D',...]
-        n_group : int, optional
-            分组数目, by default 5
-        output_dir : str, optional
-            输出路径, by default None
         position_adjust_datetimes : List[pd.Timestamp], optional
             调仓日期列表, by default None
-        quantile : Tuple[float, float], optional
-            分组分位数, by default (0.8, 1.0)
+        n_group : int, optional
+            分组数目, by default 5
+        quantile : Union[Tuple[float, float], int], optional
+            单因子策略的多头选择；
+            若为tuple，则为分位数选择，如(0.8, 1.0)表示选择分位数80%~100%的股票；
+            若为int，则为排序选择，如5表示选择排序在前五名，-5表示选择排序在后五名；
+        output_dir : str, optional
+            输出路径, by default None
         """
         self.name = name
         self.n_group = n_group
@@ -85,13 +88,15 @@ class Factor:
         """因子全面分析"""
         self.md_writer = MarkdownWriter(
             md_path=f'{self.output_dir}/{self.name}_report.md',
-            title=f'{self.name} factor report')
+            title=f'{self.name} 因子报告')
 
         # 分组
         self.group_cut()
 
-        # 计算IC、持仓、收益、换手率
+        # 计算IC、净值、换手率
         self.calc_ic()
+        self.calc_periodic_net_values()
+        self.calc_position_weights()
         self.calc_positions()
         self.calc_return()
         self.calc_turnover()
@@ -111,9 +116,14 @@ class Factor:
         self.plot_turnover()
         self.report_turnover()
 
+        # 渲染markdown为pdf
+        self.md_writer.to_pdf(f'{self.output_dir}/{self.name}_report.pdf')
+
     def analyze_quantile(self) -> None:
         """因子分位数超额收益分析"""
-        self.calc_quantile_positions()
+        self.calc_periodic_net_values()
+        self.calc_quantile_position_weights()
+        self.calc_quantile_positions(if_save=False)
         self.calc_quantile_return()
         self.make_quantile_return_performance()
 
@@ -136,7 +146,7 @@ class Factor:
             Rank_IC_df[period] = rank_ic
         self.IC_df, self.Rank_IC_df = IC_df, Rank_IC_df
 
-    def calc_factor_weighted_positions(self) -> None:
+    def calc_factor_weighted_position_weights(self) -> None:
         """计算因子加权持仓"""
         factor_series = self.factor_series[
             self.factor_series.index.get_level_values('datetime').isin(
@@ -144,20 +154,9 @@ class Factor:
 
         factor_weighted_positions = factor_series.groupby(
             'datetime').transform(lambda x: x / x.abs().sum())
-
-        def pos_series_to_pos_df(x: pd.Series) -> pd.DataFrame:
-            """将持仓序列转换为持仓dataframe"""
-            x = x.unstack()
-            x = x.reindex(self.trading_dates)
-            x = x.ffill().fillna(0)
-            return x
-
         self._factor_weighted_positions = factor_weighted_positions
-        factor_weighted_positions = pos_series_to_pos_df(
-            factor_weighted_positions)
-        self.factor_weighted_positions = factor_weighted_positions
 
-    def calc_quantile_positions(self) -> None:
+    def calc_quantile_position_weights(self) -> None:
         """计算所需分位数持仓"""
         factor_series = self.factor_series[
             self.factor_series.index.get_level_values('datetime').isin(
@@ -176,24 +175,135 @@ class Factor:
                 x.loc[x.index] = 0
                 return x
 
-        quantile_positions = factor_series.groupby('datetime').transform(
-            lambda x: quantile_pos(x, *self.quantile))
-
-        def pos_series_to_pos_df(x: pd.Series) -> pd.DataFrame:
-            """将持仓序列转换为持仓dataframe"""
-            x = x.unstack()
-            x = x.reindex(self.trading_dates)
-            x = x.ffill().fillna(0)
-            return x
+        # 如果是tuple分位数，选择对应的分位数持仓
+        if isinstance(self.quantile, tuple):
+            quantile_positions = factor_series.groupby('datetime').transform(
+                lambda x: quantile_pos(x, *self.quantile))
+        # 如果是int：如果为正，选择排序在前self.quantile名的股票；如果为负，选择排序在后-self.quantile名的股票
+        elif isinstance(self.quantile, int):
+            if self.quantile > 0:
+                quantile_positions = factor_series.groupby(
+                    'datetime').transform(lambda x: x.nlargest(self.quantile))
+            elif self.quantile < 0:
+                quantile_positions = factor_series.groupby(
+                    'datetime').transform(
+                        lambda x: x.nsmallest(-self.quantile))
 
         self._quantile_positions = quantile_positions
-        quantile_positions = pos_series_to_pos_df(quantile_positions)
-        self.quantile_positions = quantile_positions
 
-    def calc_positions(self) -> pd.DataFrame:
+    def calc_position_weights(self) -> None:
         """计算持仓"""
+        self.calc_factor_weighted_position_weights()
+        self.calc_quantile_position_weights()
+
+    def calc_positions(self) -> None:
         self.calc_factor_weighted_positions()
         self.calc_quantile_positions()
+
+    def calc_factor_weighted_positions(self) -> None:
+        # 得到每次调仓的目标权重
+        positions = self._factor_weighted_positions
+        positions = positions.unstack()
+        positions['adjust_datetime'] = positions.index
+        positions = positions.reindex(self.trading_dates)
+        positions['adjust_datetime'] = positions['adjust_datetime'].ffill(
+        ).fillna(self.trading_dates[0])
+        positions = positions.ffill().fillna(0)
+
+        # 得到每个调仓后持仓阶段的阶段性净值变化
+        periodic_net_values = self.periodic_net_values
+        periodic_weighted_net_values = periodic_net_values * positions.iloc[:, :
+                                                                            -1]
+        periodic_weighted_net_values_sum = periodic_weighted_net_values.abs(
+        ).sum(axis=1)
+        periodic_weighted_net_values_sum.name = 'weighted_net_value'
+        periodic_weighted_net_values_sum = periodic_weighted_net_values_sum.to_frame(
+        )
+        periodic_weighted_net_values_sum['adjust_datetime'] = positions[
+            'adjust_datetime']
+        periodic_net_value_base = periodic_weighted_net_values_sum.groupby(
+            'adjust_datetime').last()
+        periodic_net_value_base.iloc[0] = 1
+
+        # 得到每个阶段一开始的总净值基数
+        periodic_net_value_base = periodic_net_value_base.cumprod()
+        periodic_net_value_base = periodic_net_value_base.reindex(
+            self.trading_dates).ffill()
+
+        # 将总净值基数乘以该阶段的当天净值，得到实际当天净值
+        total_net_values = periodic_weighted_net_values_sum[[
+            'weighted_net_value'
+        ]] * periodic_net_value_base
+        total_net_values.iloc[-1] = np.nan
+
+        # 计算每部分持仓的实际净值
+        factor_weighted_positions = pd.DataFrame()
+        for col in periodic_net_values.columns:
+            factor_weighted_positions[col] = total_net_values[
+                'weighted_net_value'] * periodic_weighted_net_values[col]
+
+        self.total_factor_weighted_net_values = total_net_values
+        self.factor_weighted_positions = factor_weighted_positions
+
+    def calc_quantile_positions(self, if_save: bool = True) -> None:
+        # 得到每次调仓的目标权重
+        positions = self._quantile_positions
+        positions = positions.unstack()
+        positions['adjust_datetime'] = positions.index
+        positions = positions.reindex(self.trading_dates)
+        positions['adjust_datetime'] = positions['adjust_datetime'].ffill(
+        ).fillna(self.trading_dates[0])
+        positions = positions.ffill().fillna(0)
+
+        # 得到每个调仓后持仓阶段的阶段性净值变化
+        periodic_net_values = self.periodic_net_values
+        periodic_weighted_net_values = periodic_net_values * positions.iloc[:, :
+                                                                            -1]
+        periodic_weighted_net_values_sum = periodic_weighted_net_values.abs(
+        ).sum(axis=1)
+        periodic_weighted_net_values_sum.name = 'weighted_net_value'
+        periodic_weighted_net_values_sum = periodic_weighted_net_values_sum.to_frame(
+        )
+        periodic_weighted_net_values_sum['adjust_datetime'] = positions[
+            'adjust_datetime']
+        periodic_net_value_base = periodic_weighted_net_values_sum.groupby(
+            'adjust_datetime').last()
+        periodic_net_value_base.iloc[0] = 1
+
+        # 得到每个阶段一开始的总净值基数
+        periodic_net_value_base = periodic_net_value_base.cumprod()
+        periodic_net_value_base = periodic_net_value_base.reindex(
+            self.trading_dates).ffill()
+
+        # 将总净值基数乘以该阶段的当天净值，得到实际当天净值
+        total_net_values = periodic_weighted_net_values_sum[[
+            'weighted_net_value'
+        ]] * periodic_net_value_base
+        total_net_values.iloc[-1] = np.nan
+
+        # 计算每部分持仓的实际净值
+        quantile_positions = pd.DataFrame()
+        for col in periodic_net_values.columns:
+            quantile_positions[col] = total_net_values[
+                'weighted_net_value'] * periodic_weighted_net_values[col]
+
+        self.total_quantile_net_values = total_net_values
+        self.quantile_positions = quantile_positions
+
+        if if_save == True:
+            quantile_positions.to_csv(
+                f'{self.output_dir}/quantile_positions.csv')
+
+    def calc_periodic_net_values(self) -> None:
+        """计算阶段净值"""
+        returns = self.forward_return_df['1D'].unstack()
+        returns.loc[self.position_adjust_datetimes,
+                    'adjust_datetime'] = self.position_adjust_datetimes
+        returns['adjust_datetime'] = returns['adjust_datetime'].ffill().fillna(
+            returns.index[0])
+        periodic_net_values = returns.groupby('adjust_datetime').transform(
+            lambda x: (x + 1).cumprod())
+        self.periodic_net_values = periodic_net_values
 
     def calc_group_turnover(self) -> None:
         """计算分组换手率"""
@@ -278,10 +388,10 @@ class Factor:
 
     def calc_factor_weighted_return(self) -> None:
         """计算因子加权收益"""
-        factor_weighted_return = (self.factor_weighted_positions *
-                                  self.forward_return_df['1D'].unstack()).sum(
-                                      axis=1)
-        factor_weighted_return = factor_weighted_return.to_frame()
+        factor_weighted_return = self.total_factor_weighted_net_values.pct_change(
+        )
+        factor_weighted_return = factor_weighted_return.loc[
+            self.position_adjust_datetimes[0]:].iloc[1:].dropna()
         factor_weighted_return.columns = ['factor_weighted']
         factor_weighted_return['benchmark'] = self.bench_forward_return_df[
             '1D'].unstack().iloc[:, 0]
@@ -291,9 +401,9 @@ class Factor:
 
     def calc_quantile_return(self) -> None:
         """计算分位数收益"""
-        quantile_return = (self.quantile_positions *
-                           self.forward_return_df['1D'].unstack()).sum(axis=1)
-        quantile_return = quantile_return.to_frame()
+        quantile_return = self.total_quantile_net_values.pct_change()
+        quantile_return = quantile_return.loc[
+            self.position_adjust_datetimes[0]:].iloc[1:].dropna()
         quantile_return.columns = ['quantile']
         quantile_return['benchmark'] = self.bench_forward_return_df[
             '1D'].unstack().iloc[:, 0]
@@ -553,8 +663,8 @@ class Factor:
         daily_factor_weighted_turnover = pd.DataFrame(index=self.trading_dates,
                                                       columns=['turnover'])
         daily_factor_weighted_turnover.loc[
-            self.position_adjust_datetimes, 'turnover'] = self.factor_weighted_turnover[
-                'turnover']
+            self.position_adjust_datetimes,
+            'turnover'] = self.factor_weighted_turnover['turnover']
         daily_factor_weighted_turnover = daily_factor_weighted_turnover.fillna(
             0)
         plot_turnover(daily_factor_weighted_turnover, output_dir,
@@ -567,8 +677,8 @@ class Factor:
         daily_quantile_turnover = pd.DataFrame(index=self.trading_dates,
                                                columns=['turnover'])
         daily_quantile_turnover.loc[
-            self.position_adjust_datetimes, 'turnover'] = self.quantile_turnover[
-                'turnover']
+            self.position_adjust_datetimes,
+            'turnover'] = self.quantile_turnover['turnover']
         daily_quantile_turnover = daily_quantile_turnover.fillna(0)
         plot_turnover(daily_quantile_turnover, output_dir,
                       f'{self.name}_quantile')

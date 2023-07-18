@@ -522,15 +522,15 @@ class CalcPool:
     def calc_factors(self) -> pd.DataFrame:
         """计算因子（单进程或多进程）"""
         if self.n_jobs == 1:
-            for factor_name, expression in tqdm(self.expressions.items(), desc=
-                                                '>>> Calculating factors'):
+            for factor_name, expression in tqdm(
+                    self.expressions.items(), desc='>>> Calculating factors'):
                 self._calc_factor(self.name_space, factor_name, expression)
         else:
             processes: List[Process] = []  # 进程列表，用于存储正在运行的进程
             queue = Queue()  # 进程队列，用于存储已完成的进程
 
             tqdm_obj = tqdm(total=len(self.expressions),
-                            desc=f'>>> Calculating factors (n_jobs={self.n_jobs})')
+                            desc='>>> Calculating factors')
 
             # 遍历 expressions创建进程
             for factor_name, expression in self.expressions.items():
@@ -543,7 +543,7 @@ class CalcPool:
                     completed_process_pid = queue.get()  # 等待一个进程基本结束
                     for process in processes:
                         if process.pid == completed_process_pid:
-                            process.join() # 等待进程彻底结束
+                            process.join()  # 等待进程彻底结束
                             processes.remove(process)  # 移除已完成的进程
                             tqdm_obj.update()
 
@@ -578,7 +578,6 @@ if __name__ == '__main__':
         expression6
     ] * 2
 
-    # # 不使用多进程，逐个计算：26.115471601486206s
     # start = time()
     # n_jobs = 1
     # pool = CalcPool(df, expressions, n_jobs=n_jobs)
@@ -587,9 +586,8 @@ if __name__ == '__main__':
     # print(factors)
     # print(f'不使用多进程逐个计算耗时：{end - start}s')
 
-    # 使用多进程计算：9.184092998504639s
     start = time()
-    n_jobs = 2
+    n_jobs = 6
     pool = CalcPool(df, expressions, n_jobs=n_jobs)
     factors = pool.calc_factors()
     end = time()
