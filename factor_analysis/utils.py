@@ -46,12 +46,13 @@ def generate_stock_df(
     dates = pd.date_range(start_date, periods=n_days, freq='B')
 
     returns = np.random.uniform(low=-0.1, high=0.1, size=(n_days, n_stocks))
-    closes = (1 + returns).cumprod(axis=1) * 100
+    closes = pd.DataFrame((1 + returns).cumprod(axis=0) * 100)
 
     highs = closes + np.random.uniform(low=0, high=10, size=(n_days, n_stocks))
     lows = closes - np.random.uniform(low=0, high=10, size=(n_days, n_stocks))
-    opens = lows + np.random.uniform(low=0, high=10, size=(n_days, n_stocks))
-    volumes = np.random.uniform(low=1e5, high=5e5, size=(n_days, n_stocks))
+    opens = lows + np.random.uniform(low=-3, high=3, size=(n_days, n_stocks))
+    volumes = pd.DataFrame(
+        np.random.uniform(low=1e5, high=5e5, size=(n_days, n_stocks)))
 
     order_book_ids = [([f'{i:06d}.XSHE'] * n_days) for i in range(n_stocks)]
     order_book_ids = np.concatenate(order_book_ids)
@@ -59,11 +60,11 @@ def generate_stock_df(
     data = pd.DataFrame({
         'datetime': np.concatenate([dates] * n_stocks),
         'order_book_id': order_book_ids,
-        'open': opens.reshape(-1),
-        'high': highs.reshape(-1),
-        'low': lows.reshape(-1),
-        'close': closes.reshape(-1),
-        'volume': volumes.reshape(-1),
+        'open': pd.melt(opens).value,
+        'high': pd.melt(highs).value,
+        'low': pd.melt(lows).value,
+        'close': pd.melt(closes).value,
+        'volume': pd.melt(volumes).value,
     })
     data = data.set_index(['datetime', 'order_book_id'])
     data = data.sort_index()
