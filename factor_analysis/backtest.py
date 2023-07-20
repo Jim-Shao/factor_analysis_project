@@ -48,7 +48,7 @@ class FactorBacktest:
         factor_df: pd.DataFrame = None,
         factor_expressions: Union[List[str], Dict[str, str]] = None,
         benchmark_df: pd.DataFrame = None,
-        forward_periods: Union[int, List[int]] = [1, 5, 20],
+        forward_periods: Union[int, List[int]] = [1, 5, 10, 20],
         position_adjust_datetimes: List[pd.Timestamp] = None,
         postprocess_queue: PostprocessQueue = None,
         choice: Union[Tuple[float, float], int] = (0.8, 1.0),
@@ -72,9 +72,10 @@ class FactorBacktest:
             关于可以使用哪些函数和变量，请参考factor_analysis.factor_calc文件；
             默认为None，但是不能和factor_df同时为None
         benchmark_df : pd.DataFrame, optional
-            基准数据，multi-index[datetime, symbol]，columns=['open', 'high', 'low', 'close', 'volume', ...]，默认为None
+            基准数据，multi-index[datetime, symbol]，columns=['open', 'high', 'low', 'close', 'volume', ...]，默认为None；
+            如果为None，表示基准为每天等权持仓所有股票，日度换仓；
         forward_periods : Union[int, List[int]], optional
-            前瞻期数，可以是一个整数，也可以是一个整数列表，默认为[1, 5, 20]
+            前瞻期数，可以是一个整数，也可以是一个整数列表，默认为[1, 5, 10, 20]
         position_adjust_datetimes : List[pd.Timestamp], optional
             调仓日期列表，每个元素为一个pd.Timestamp对象，默认为None，表示每天都调仓；
             可以在当调仓日为某些特定时刻时使用，比如每年的财务日：每年4月、8月、10月最后一天；
@@ -89,7 +90,7 @@ class FactorBacktest:
         n_groups : int, optional
             分组数，默认为5
         n_jobs : int, optional
-            多进程数量，默认为1
+            多进程数量，默认为1，表示单进程运行，如果为-1，则使用所有可用的CPU核心数
         """
         assert_std_index(bar_df, 'bar_df', 'df')
 
@@ -97,7 +98,6 @@ class FactorBacktest:
         self.forward_periods = forward_periods
         self.benchmark_df = benchmark_df
         self.n_groups = n_groups
-        self.n_jobs = n_jobs
         self.postprocess_queue = postprocess_queue
         self.choice = choice
 
@@ -132,6 +132,14 @@ class FactorBacktest:
             pd.Index(factor_expressions.keys())).tolist()
         self.factor_expressions = factor_expressions
 
+        # 设定进程数
+        if n_jobs == -1:
+            self.n_jobs = min(os.cpu_count(), len(self.factor_names))
+        elif n_jobs > 0:
+            self.n_jobs = min(n_jobs, len(self.factor_names), os.cpu_count())
+        else:
+            raise ValueError("n_jobs must be -1 or positive integer")
+
         # 创建文件夹
         if output_dir is None:
             current_dir = os.getcwd()
@@ -164,10 +172,10 @@ class FactorBacktest:
                 factor_series=factor_series,
                 forward_return_df=self.forward_return_df,
                 bench_forward_return_df=self.bench_return_df,
-                n_group=self.n_groups,
-                output_dir=self.output_dir,
                 position_adjust_datetimes=self.position_adjust_datetimes,
+                n_group=self.n_groups,
                 quantile=self.choice,
+                output_dir=self.output_dir,
             )
             self.factor_list.append(factor)
         self.analyze_factors()  # 分析因子
@@ -217,7 +225,15 @@ class FactorBacktest:
         forward_return_df = calc_return(self.bar_df, forward_periods)
         forward_return_df = forward_return_df.loc[self.factor_df.index]
         self.forward_return_df = forward_return_df
-        self.bench_return_df = calc_return(self.benchmark_df, forward_periods)
+        if self.benchmark_df is not None:
+            self.bench_return_df = calc_return(self.benchmark_df,
+                                               forward_periods)
+        else:
+            self.bench_return_df = forward_return_df.groupby(
+                level='datetime').mean()
+            self.bench_return_df.index = pd.MultiIndex.from_product(
+                [self.bench_return_df.index, ['equal_weight']],
+                names=['datetime', 'order_book_id'])
         end_time = time.time()
         print(f"Done in {end_time-start_time:.2f}s")
 
@@ -264,7 +280,7 @@ class FactorBacktest:
         start = time.time()
         print(">>> Plotting factor correlation:", end=' ')
         factor_corr = self.factor_df.corr()
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(12, 10), dpi=150)
         sns.heatmap(factor_corr, annot=True, cmap='RdYlGn', linewidths=0.2)
         plt.title('Factor Correlation')
         plt.savefig(os.path.join(self.output_dir, 'factor_corr.png'))
@@ -277,7 +293,7 @@ class FactorBacktest:
         如果有提升，再尝试向组合中逐个添加新因子至三个因子，比较三个因子的组合相对于两个因子的组合是否有边际提升，
         依次类推，直到没有边际提升为止"""
 
-        factor_names = self.factor_df.columns.tolist()
+        factor_names = self.factor_names
         if len(factor_names) == 1:
             print(">>> Only one factor, skip optimizing factor combination")
             return
@@ -298,7 +314,7 @@ class FactorBacktest:
 
         # 得到单因子的超额收益表现
         old_sharpe_list = [
-            factor.quantile_return_performance.loc['excess', 'annual_sharpe']
+            factor.quantile_return_performance.loc['excess', 'ann_sharpe']
             for factor in self.factor_list
         ]
         old_best = np.argmax(old_sharpe_list)
@@ -369,7 +385,7 @@ class FactorBacktest:
 
         # 两两组合的因子分析完毕，开始比较两两组合的因子的超额收益表现
         sharpe_list = [
-            factor.quantile_return_performance.loc['excess', 'annual_sharpe']
+            factor.quantile_return_performance.loc['excess', 'ann_sharpe']
             for factor in factor_list
         ]
         done_combinations = dict(zip(factor_combinations, sharpe_list))
@@ -449,8 +465,7 @@ class FactorBacktest:
 
             # 比较新组合的因子的超额收益表现与当前最优组合的因子的超额收益表现
             sharpe_list = [
-                factor.quantile_return_performance.loc['excess',
-                                                       'annual_sharpe']
+                factor.quantile_return_performance.loc['excess', 'ann_sharpe']
                 for factor in factor_list
             ]
             best_sharpe_idx = np.argmax(sharpe_list)

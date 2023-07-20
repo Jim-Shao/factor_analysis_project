@@ -116,8 +116,11 @@ class Factor:
         self.plot_turnover()
         self.report_turnover()
 
+        # 渲染markdown为pdf
+        self.md_writer.to_pdf(f'{self.output_dir}/{self.name}_report.pdf')
+
     def analyze_quantile(self) -> None:
-        """因子分位数超额收益分析"""
+        """单因子策略超额收益分析"""
         self.calc_periodic_net_values()
         self.calc_quantile_position_weights()
         self.calc_quantile_positions(if_save=False)
@@ -154,13 +157,13 @@ class Factor:
         self._factor_weighted_positions = factor_weighted_positions
 
     def calc_quantile_position_weights(self) -> None:
-        """计算所需分位数持仓"""
+        """计算所需单因子策略持仓"""
         factor_series = self.factor_series[
             self.factor_series.index.get_level_values('datetime').isin(
                 self.position_adjust_datetimes)]
 
         def quantile_pos(x: pd.Series, start: float, end: float) -> pd.Series:
-            """计算分位数持仓"""
+            """计算单因子策略持仓"""
             ranked_x = x.rank(pct=True)
             index = ranked_x[(ranked_x >= start) & (ranked_x <= end)].index
             n = len(index)
@@ -213,6 +216,7 @@ class Factor:
                                                                             -1]
         periodic_weighted_net_values_sum = periodic_weighted_net_values.abs(
         ).sum(axis=1)
+        periodic_weighted_net_values_sum.iloc[-1] = np.nan  # 最后一天的净值不计算
         periodic_weighted_net_values_sum.name = 'weighted_net_value'
         periodic_weighted_net_values_sum = periodic_weighted_net_values_sum.to_frame(
         )
@@ -238,6 +242,13 @@ class Factor:
         for col in periodic_net_values.columns:
             factor_weighted_positions[col] = total_net_values[
                 'weighted_net_value'] * periodic_weighted_net_values[col]
+
+        # 将净值下移一天得到实际的持仓净值（而非一天后的净值）
+        factor_weighted_positions = factor_weighted_positions.shift(1).fillna(
+            0)
+        # 第一天换仓的持仓是根据目标权重确定的
+        factor_weighted_positions.loc[self.position_adjust_datetimes[
+            0]] = positions.loc[self.position_adjust_datetimes[0]]
 
         self.total_factor_weighted_net_values = total_net_values
         self.factor_weighted_positions = factor_weighted_positions
@@ -284,6 +295,12 @@ class Factor:
             quantile_positions[col] = total_net_values[
                 'weighted_net_value'] * periodic_weighted_net_values[col]
 
+        # 将净值下移一天得到实际的持仓净值（而非一天后的净值）
+        quantile_positions = quantile_positions.shift(1).fillna(0)
+        # 第一天换仓的持仓是根据目标权重确定的
+        quantile_positions.loc[self.position_adjust_datetimes[
+            0]] = positions.loc[self.position_adjust_datetimes[0]]
+
         self.total_quantile_net_values = total_net_values
         self.quantile_positions = quantile_positions
 
@@ -300,6 +317,8 @@ class Factor:
             returns.index[0])
         periodic_net_values = returns.groupby('adjust_datetime').transform(
             lambda x: (x + 1).cumprod())
+        # 最后一天用倒数第二天填充，因为最后一天的收益是无法计算的
+        periodic_net_values.iloc[-1] = periodic_net_values.iloc[-2]
         self.periodic_net_values = periodic_net_values
 
     def calc_group_turnover(self) -> None:
@@ -342,7 +361,7 @@ class Factor:
         self.factor_weighted_turnover = factor_weighted_turnover
 
     def calc_quantile_turnover(self) -> None:
-        """计算分位数持仓换手率"""
+        """计算单因子策略持仓换手率"""
         forward_return_1D = (self.forward_return_df['1D'].unstack() +
                              1).cumprod()
         forward_return = forward_return_1D.loc[
@@ -397,15 +416,15 @@ class Factor:
         self.factor_weighted_return = factor_weighted_return
 
     def calc_quantile_return(self) -> None:
-        """计算分位数收益"""
+        """计算单因子策略收益"""
         quantile_return = self.total_quantile_net_values.pct_change()
         quantile_return = quantile_return.loc[
             self.position_adjust_datetimes[0]:].iloc[1:].dropna()
-        quantile_return.columns = ['quantile']
+        quantile_return.columns = ['strategy']
         quantile_return['benchmark'] = self.bench_forward_return_df[
             '1D'].unstack().iloc[:, 0]
         quantile_return['excess'] = quantile_return[
-            'quantile'] - quantile_return['benchmark']
+            'strategy'] - quantile_return['benchmark']
         self.quantile_return = quantile_return
 
     def calc_return(self) -> None:
@@ -458,8 +477,9 @@ class Factor:
         for period, output_df in self.IC_tables.items():
             self.md_writer.add_title(period, 3)
             self.md_writer.add_image(
-                'IC分布', f'{self.output_dir}/IC/{self.name}_{period}.png')
+                'IC分布', f'{self.output_dir}/IC/{self.name}_{period}.svg')
             self.md_writer.add_table(output_df, float_format='.4f')
+        self.md_writer.add_pagebreak()
 
     def make_group_return_performance(self):
         """生成分组收益表现"""
@@ -471,7 +491,7 @@ class Factor:
             period_int = int(period[:-1])
 
             groups = group_returns.columns.to_list()
-            # [group_last, group1], [long_excess, short_excess, long_short]
+            # [group_last, group1], [benchmark, long_excess, short_excess, long_short]
             target_groups = [groups[-5], groups[0]] + groups[-4:]
 
             performance_dict_list = []
@@ -510,7 +530,7 @@ class Factor:
             factor_weighted_return)
 
     def make_quantile_return_performance(self):
-        """生成分位数收益表现"""
+        """生成单因子策略收益表现"""
         quantile_return = self.quantile_return
 
         def get_performances(return_df: pd.DataFrame) -> pd.DataFrame:
@@ -549,7 +569,7 @@ class Factor:
                        f'{self.name}_factor_weighted')
 
     def plot_quantile_net_value(self):
-        """绘制分位数净值图"""
+        """绘制单因子策略净值图"""
         output_dir = f'{self.output_dir}/net_value'
         os.makedirs(output_dir, exist_ok=True)
         plot_net_value(self.quantile_return, 1, output_dir,
@@ -566,35 +586,45 @@ class Factor:
         self.md_writer.add_title('分层收益', 3)
         for period, output_df in self.group_return_performance.items():
             self.md_writer.add_title(period, 3)
-            self.md_writer.add_table(output_df, float_format='.4f')
             self.md_writer.add_image(
                 '分层净值',
-                f'{self.output_dir}/net_value/{self.name}_{period}.png')
+                f'{self.output_dir}/net_value/{self.name}_{period}.svg')
+            self.md_writer.add_table(output_df, float_format='.4f')
 
     def report_factor_weighted_return_performance(self):
         """生成因子加权持仓收益表现报告至Markdown"""
         self.md_writer.add_title('因子加权日频收益', 3)
-        self.md_writer.add_table(self.factor_weighted_return_performance,
-                                 float_format='.4f')
         self.md_writer.add_image(
             '因子加权净值',
-            f'{self.output_dir}/net_value/{self.name}_factor_weighted.png')
+            f'{self.output_dir}/net_value/{self.name}_factor_weighted.svg')
+        self.md_writer.add_table(self.factor_weighted_return_performance,
+                                 float_format='.4f')
 
     def report_quantile_return_performance(self):
-        """生成分位数收益表现报告至Markdown"""
-        self.md_writer.add_title(f'分位数{self.quantile}收益', 3)
+        """生成单因子策略收益表现报告至Markdown"""
+        if isinstance(self.quantile, tuple):
+            title = f'单因子策略{self.quantile}'
+        elif self.quantile > 0:
+            title = f'单因子策略（前{self.quantile}支）'
+        elif self.quantile < 0:
+            title = f'单因子策略（后{-self.quantile}支）'
+        else:
+            raise ValueError('quantile不支持这个值')
+        self.md_writer.add_title(f'{title}收益', 3)
+        self.md_writer.add_image(
+            f'{title}净值',
+            f'{self.output_dir}/net_value/{self.name}_quantile.svg')
         self.md_writer.add_table(self.quantile_return_performance,
                                  float_format='.4f')
-        self.md_writer.add_image(
-            f'分位数净值{self.quantile}',
-            f'{self.output_dir}/net_value/{self.name}_quantile.png')
 
     def report_return_performance(self):
         """生成收益表现报告至Markdown"""
         self.md_writer.add_title('收益分析', 2)
         self.report_group_return_performance()
+        self.md_writer.add_pagebreak()
         self.report_factor_weighted_return_performance()
         self.report_quantile_return_performance()
+        self.md_writer.add_pagebreak()
 
     def make_group_turnover_table(self):
         """生成分组换手率表"""
@@ -624,13 +654,14 @@ class Factor:
             'turnover_mean': factor_weighted_turnover.mean(),
             'turnover_std': factor_weighted_turnover.std()
         }
-        factor_weighted_turnover_table = pd.DataFrame([turnover_dict])
+        factor_weighted_turnover_table = pd.DataFrame(
+            [turnover_dict], index=['factor_weighted'])
         self.factor_weighted_turnover_table = factor_weighted_turnover_table
 
     def make_quantile_turnover_table(self):
-        """生成分位数换手率表"""
+        """生成单因子策略换手率表"""
         quantile_turnover = self.quantile_turnover
-        assert quantile_turnover.shape[1] == 1, '分位数换手率不止一列'
+        assert quantile_turnover.shape[1] == 1, '单因子策略换手率不止一列'
         quantile_turnover = quantile_turnover.iloc[:, 0]
         quantile_turnover = quantile_turnover[quantile_turnover != 0]
         turnover_dict = {
@@ -638,7 +669,8 @@ class Factor:
             'turnover_mean': quantile_turnover.mean(),
             'turnover_std': quantile_turnover.std()
         }
-        quantile_turnover_table = pd.DataFrame([turnover_dict])
+        quantile_turnover_table = pd.DataFrame([turnover_dict],
+                                               index=['strategy'])
         self.quantile_turnover_table = quantile_turnover_table
 
     def make_turnover_table(self):
@@ -668,7 +700,7 @@ class Factor:
                       f'{self.name}_factor_weighted')
 
     def plot_quantile_turnover(self):
-        """绘制分位数持仓换手率图"""
+        """绘制单因子策略持仓换手率图"""
         output_dir = f'{self.output_dir}/turnover'
         os.makedirs(output_dir, exist_ok=True)
         daily_quantile_turnover = pd.DataFrame(index=self.trading_dates,
@@ -683,14 +715,16 @@ class Factor:
     def plot_turnover(self):
         """绘制换手率图"""
         self.plot_group_turnover()
+        self.md_writer.add_pagebreak()
         self.plot_factor_weighted_turnover()
         self.plot_quantile_turnover()
+        self.md_writer.add_pagebreak()
 
     def report_group_turnover(self):
         """生成分组换手率报告至Markdown"""
         self.md_writer.add_title('分层换手率', 3)
         self.md_writer.add_image(
-            '分层换手率分布', f'{self.output_dir}/turnover/{self.name}_group.png')
+            '分层换手率分布', f'{self.output_dir}/turnover/{self.name}_group.svg')
         self.md_writer.add_table(self.turnover_table, float_format='.4f')
 
     def report_factor_weighted_turnover(self):
@@ -698,16 +732,24 @@ class Factor:
         self.md_writer.add_title('因子加权持仓换手率', 3)
         self.md_writer.add_image(
             '因子加权持仓换手率',
-            f'{self.output_dir}/turnover/{self.name}_factor_weighted.png')
+            f'{self.output_dir}/turnover/{self.name}_factor_weighted.svg')
         self.md_writer.add_table(self.factor_weighted_turnover_table,
                                  float_format='.4f')
 
     def report_quantile_turnover(self):
-        """生成分位数持仓换手率报告至Markdown"""
-        self.md_writer.add_title(f'分位数{self.quantile}换手率', 3)
+        """生成单因子策略持仓换手率报告至Markdown"""
+        if isinstance(self.quantile, tuple):
+            title = f'单因子策略{self.quantile}'
+        elif self.quantile > 0:
+            title = f'单因子策略（前{self.quantile}支）'
+        elif self.quantile < 0:
+            title = f'单因子策略（后{-self.quantile}支）'
+        else:
+            raise ValueError('quantile不支持这个值')
+        self.md_writer.add_title(f'{title}换手率', 3)
         self.md_writer.add_image(
-            f'分位数换手率 {self.quantile}',
-            f'{self.output_dir}/turnover/{self.name}_quantile.png')
+            f'{title}换手率',
+            f'{self.output_dir}/turnover/{self.name}_quantile.svg')
         self.md_writer.add_table(self.quantile_turnover_table,
                                  float_format='.4f')
 

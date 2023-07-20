@@ -63,7 +63,7 @@ def plot_net_value(
     forward_period: int,
     fig_dir: str,
     fig_name: str,
-    fig_size: Tuple[int, int] = (16, 7),
+    fig_size: Tuple[int, int] = (16, 4.4),
     dpi: int = 150,
     xtick_freq: str = 'year',
 ):
@@ -81,7 +81,7 @@ def plot_net_value(
     fig_name : str
         图片名称，e.g. 'net_value'
     fig_size : Tuple[int, int], optional
-        图片大小, by default (16, 7)
+        图片大小, by default (10, 4.4)
     dpi : int, optional
         图片dpi, by default 150
     xtick_freq : str, optional
@@ -120,7 +120,7 @@ def plot_net_value(
     start_date = datetimes[0].strftime('%Y-%m-%d')
     end_date = datetimes[-1].strftime('%Y-%m-%d')
     title = f'Net Value: ({start_date} ~ {end_date})'
-    save_path = os.path.join(fig_dir, f'{fig_name}.png')
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.legend(loc="upper left")
     plt.grid()
     plt.title(title)
@@ -133,7 +133,7 @@ def plot_ic_series(
         IC_series: pd.Series,
         fig_dir: str,
         fig_name: str,
-        fig_size: Tuple[int, int] = (16, 7),
+        fig_size: Tuple[int, int] = (16, 6),
         dpi: int = 150,
 ):
     """
@@ -148,7 +148,7 @@ def plot_ic_series(
     fig_name : str
         图片名称，e.g. 'ic'
     fig_size : Tuple[int, int], optional
-        图片大小, by default (16, 7)
+        图片大小, by default (10, 5)
     dpi : int, optional
         图片dpi, by default 150
     """
@@ -250,7 +250,7 @@ def plot_ic_series(
     start_date = datetimes[0].strftime('%Y-%m-%d')
     end_date = datetimes[-1].strftime('%Y-%m-%d')
     title = f'IC: ({start_date} ~ {end_date})'
-    save_path = os.path.join(fig_dir, f'{fig_name}.png')
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.title(title)
     plt.tight_layout()
     plt.savefig(save_path)
@@ -261,7 +261,7 @@ def plot_turnover(
     turnover_df: pd.DataFrame,
     fig_dir: str,
     fig_name: str,
-    fig_size: Tuple[int, int] = (16, 5),
+    fig_size: Tuple[int, int] = (16, 3),
     dpi: int = 150,
     xtick_freq: str = 'year',
     MA_window: int = 20,
@@ -278,7 +278,7 @@ def plot_turnover(
     fig_name : str
         图片名称，e.g. 'turnover'
     fig_size : Tuple[int, int], optional
-        图片大小，by default (16, 5)
+        图片大小，by default (10, 2.3)
     dpi : int, optional
         图片分辨率，by default 150
     xtick_freq : str, optional
@@ -383,7 +383,7 @@ def plot_turnover(
     plt.tight_layout()
 
     # 保存图
-    save_path = os.path.join(fig_dir, f'{fig_name}.png')
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.savefig(save_path, dpi=dpi)
     plt.close()
 

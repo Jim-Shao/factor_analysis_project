@@ -476,35 +476,38 @@ class ReturnPerformance:
     def performance(self) -> dict:
         # default output of performance
         performance = {
-            'annual_return': self.annual_return,
-            'max_drawdown': self.max_drawdown,
-            'annual_sharpe': self.annual_sharpe,
-            'annual_calmar': self.annual_calmar,
+            'ann_ret': self.annual_return,
+            'max_dd': self.max_drawdown,
+            'ann_sharpe': self.annual_sharpe,
+            'ann_calmar': self.annual_calmar,
             'win_rate': self.win_rate,
-            'avg_win_return': np.mean(self.profit),
-            'avg_loss_return': np.mean(self.loss),
+            'avg_win_ret': np.mean(self.profit),
+            'avg_loss_ret': np.mean(self.loss),
             'profit_loss_ratio': self.profit_loss_ratio,
-            'annual_volatility': self.annual_volatility,
-            'annual_downside_deviation': self.annual_downside_deviation,
-            'annual_sortino': self.annual_sortino,
+            'ann_vol': self.annual_volatility,
+            # 'annual_downside_deviation': self.annual_downside_deviation,
+            # 'annual_sortino': self.annual_sortino,
         }
 
         # if the benchmark is set, add the benchmark related performance
         if self._with_bench == True:
             performance.update({
-                'annual_bench_return': self.annual_bench_return,
-                'annual_tracking_return': self.annual_tracking_return,
+                'ann_bench_ret': self.annual_bench_return,
+                'ann_tracking_ret': self.annual_tracking_return,
                 'tracking_win_rate': self.tracking_win_rate,
                 'tracking_error': self.tracking_error,
-                'annual_tracking_error': self.annual_tracking_error,
-                'annual_information_ratio': self.annual_information_ratio,
+                'ann_tracking_error': self.annual_tracking_error,
+                'ann_information_ratio': self.annual_information_ratio,
                 'bench_corr': self.bench_corr,
                 'beta': self.beta,
                 'alpha': self.alpha,
-                'annual_alpha': self.annual_alpha,
+                'ann_alpha': self.annual_alpha,
             })
 
         performance = {k: round(v, 4) for k, v in performance.items()}
+        if abs(performance['ann_ret']) > 0.999:
+            print()
+
         return performance
 
 
