@@ -2,7 +2,9 @@
 
 ## 1. 介绍
 该工具用于生成markdown与pdf格式的因子回测报告
+
 -[点击查看markdown示例报告](/factor_analysis_output/factor1/factor1_report.md)
+
 -[点击查看pdf示例报告](/factor_analysis_output/factor1/factor1_report.pdf)
 
 功能：
