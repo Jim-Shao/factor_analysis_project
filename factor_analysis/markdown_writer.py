@@ -296,7 +296,7 @@ class MarkdownWriter:
         添加分页符
         """
         with open(self.md_path, "a", encoding="utf-8") as f:
-            f.write("<div style=\"page-break-after: always;\"></div>\n")
+            f.write("<div style=\"page-break-after: always;\"></div>\n\n")
 
     def add_math(self, math: str):
         """

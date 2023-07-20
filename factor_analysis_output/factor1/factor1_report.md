@@ -37,6 +37,7 @@
 | IC_IR   |  0.0906 | 0.0959 | 0.0408 | 0.1345 |    nan |
 
 <div style="page-break-after: always;"></div>
+
 ## 收益分析
 ### 分层收益
 ### 1D
@@ -88,6 +89,7 @@
 | long_short    |    0.3652 |   0.1858 |       1.5419 |      31.1990 |     0.5325 |        0.0114 |        -0.0102 |              1.1238 |    0.2173 |
 
 <div style="page-break-after: always;"></div>
+
 ### 因子加权日频收益
 ![因子加权净值](net_value/factor1_factor_weighted.svg)
 
@@ -107,6 +109,7 @@
 | excess    |    0.2272 |   0.6286 |       0.6249 |       5.7367 |     0.5109 |        0.0297 |        -0.0271 |              1.0990 |    0.7903 |
 
 <div style="page-break-after: always;"></div>
+
 ## 换手率分析
 ### 分层换手率
 ![分层换手率分布](turnover/factor1_group.svg)
@@ -120,6 +123,7 @@
 | group_5 |         755.0000 |          0.8377 |         0.2342 |
 
 <div style="page-break-after: always;"></div>
+
 ### 因子加权持仓换手率
 ![因子加权持仓换手率](turnover/factor1_factor_weighted.svg)
 
@@ -135,3 +139,4 @@
 | strategy |          37.0000 |          0.6912 |         0.2862 |
 
 <div style="page-break-after: always;"></div>
+
