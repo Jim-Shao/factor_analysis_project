@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ROE_report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+        href="file:////home/shaoshijie/.vscode-server/extensions/shd101wyy.markdown-preview-enhanced-0.6.8/node_modules/@shd101wyy/mume/dependencies/katex/katex.min.css">
+
+
+
+
+
+
+
+
+
+    <style>
+        /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            color: #333;
+            background: none;
+            font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            text-align: left;
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+            line-height: 1.4;
+
+            -moz-tab-size: 8;
+            -o-tab-size: 8;
+            tab-size: 8;
+
+            -webkit-hyphens: none;
+            -moz-hyphens: none;
+            -ms-hyphens: none;
+            hyphens: none;
+        }
+
+        /* Code blocks */
+        pre[class*="language-"] {
+            padding: .8em;
+            overflow: auto;
+            /* border: 1px solid #ddd; */
+            border-radius: 3px;
+            /* background: #fff; */
+            background: #f5f5f5;
+        }
+
+        /* Inline code */
+        :not(pre)>code[class*="language-"] {
+            padding: .1em;
+            border-radius: .3em;
+            white-space: normal;
+            background: #f5f5f5;
+        }
+
+        .token.comment,
+        .token.blockquote {
+            color: #969896;
+        }
+
+        .token.cdata {
+            color: #183691;
+        }
+
+        .token.doctype,
+        .token.punctuation,
+        .token.variable,
+        .token.macro.property {
+            color: #333;
+        }
+
+        .token.operator,
+        .token.important,
+        .token.keyword,
+        .token.rule,
+        .token.builtin {
+            color: #a71d5d;
+        }
+
+        .token.string,
+        .token.url,
+        .token.regex,
+        .token.attr-value {
+            color: #183691;
+        }
+
+        .token.property,
+        .token.number,
+        .token.boolean,
+        .token.entity,
+        .token.atrule,
+        .token.constant,
+        .token.symbol,
+        .token.command,
+        .token.code {
+            color: #0086b3;
+        }
+
+        .token.tag,
+        .token.selector,
+        .token.prolog {
+            color: #63a35c;
+        }
+
+        .token.function,
+        .token.namespace,
+        .token.pseudo-element,
+        .token.class,
+        .token.class-name,
+        .token.pseudo-class,
+        .token.id,
+        .token.url-reference .token.variable,
+        .token.attr-name {
+            color: #795da3;
+        }
+
+        .token.entity {
+            cursor: help;
+        }
+
+        .token.title,
+        .token.title .token.punctuation {
+            font-weight: bold;
+            color: #1d3e81;
+        }
+
+        .token.list {
+            color: #ed6a43;
+        }
+
+        .token.inserted {
+            background-color: #eaffea;
+            color: #55a532;
+        }
+
+        .token.deleted {
+            background-color: #ffecec;
+            color: #bd2c00;
+        }
+
+        .token.bold {
+            font-weight: bold;
+        }
+
+        .token.italic {
+            font-style: italic;
+        }
+
+
+        /* JSON */
+        .language-json .token.property {
+            color: #183691;
+        }
+
+        .language-markup .token.tag .token.punctuation {
+            color: #333;
+        }
+
+        /* CSS */
+        code.language-css,
+        .language-css .token.function {
+            color: #0086b3;
+        }
+
+        /* YAML */
+        .language-yaml .token.atrule {
+            color: #63a35c;
+        }
+
+        code.language-yaml {
+            color: #183691;
+        }
+
+        /* Ruby */
+        .language-ruby .token.function {
+            color: #333;
+        }
+
+        /* Markdown */
+        .language-markdown .token.url {
+            color: #795da3;
+        }
+
+        /* Makefile */
+        .language-makefile .token.symbol {
+            color: #795da3;
+        }
+
+        .language-makefile .token.variable {
+            color: #183691;
+        }
+
+        .language-makefile .token.builtin {
+            color: #0086b3;
+        }
+
+        /* Bash */
+        .language-bash .token.keyword {
+            color: #0086b3;
+        }
+
+        /* highlight */
+        pre[data-line] {
+            position: relative;
+            padding: 1em 0 1em 3em;
+        }
+
+        pre[data-line] .line-highlight-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: transparent;
+            display: block;
+            width: 100%;
+        }
+
+        pre[data-line] .line-highlight {
+            position: absolute;
+            left: 0;
+            right: 0;
+            padding: inherit 0;
+            margin-top: 1em;
+            background: hsla(24, 20%, 50%, .08);
+            background: linear-gradient(to right, hsla(24, 20%, 50%, .1) 70%, hsla(24, 20%, 50%, 0));
+            pointer-events: none;
+            line-height: inherit;
+            white-space: pre;
+        }
+
+        pre[data-line] .line-highlight:before,
+        pre[data-line] .line-highlight[data-end]:after {
+            content: attr(data-start);
+            position: absolute;
+            top: .4em;
+            left: .6em;
+            min-width: 1em;
+            padding: 0 .5em;
+            background-color: hsla(24, 20%, 50%, .4);
+            color: hsl(24, 20%, 95%);
+            font: bold 65%/1.5 sans-serif;
+            text-align: center;
+            vertical-align: .3em;
+            border-radius: 999px;
+            text-shadow: none;
+            box-shadow: 0 1px white;
+        }
+
+        pre[data-line] .line-highlight[data-end]:after {
+            content: attr(data-end);
+            top: auto;
+            bottom: .4em;
+        }
+
+        html body {
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            overflow: initial;
+            box-sizing: border-box;
+            word-wrap: break-word
+        }
+
+        html body>:first-child {
+            margin-top: 0
+        }
+
+        html body h1,
+        html body h2,
+        html body h3,
+        html body h4,
+        html body h5,
+        html body h6 {
+            line-height: 1.2;
+            margin-top: 1em;
+            margin-bottom: 16px;
+            color: #000
+        }
+
+        html body h1 {
+            font-size: 2.25em;
+            font-weight: 300;
+            padding-bottom: .3em
+        }
+
+        html body h2 {
+            font-size: 1.75em;
+            font-weight: 400;
+            padding-bottom: .3em
+        }
+
+        html body h3 {
+            font-size: 1.5em;
+            font-weight: 500
+        }
+
+        html body h4 {
+            font-size: 1.25em;
+            font-weight: 600
+        }
+
+        html body h5 {
+            font-size: 1.1em;
+            font-weight: 600
+        }
+
+        html body h6 {
+            font-size: 1em;
+            font-weight: 600
+        }
+
+        html body h1,
+        html body h2,
+        html body h3,
+        html body h4,
+        html body h5 {
+            font-weight: 600
+        }
+
+        html body h5 {
+            font-size: 1em
+        }
+
+        html body h6 {
+            color: #5c5c5c
+        }
+
+        html body strong {
+            color: #000
+        }
+
+        html body del {
+            color: #5c5c5c
+        }
+
+        html body a:not([href]) {
+            color: inherit;
+            text-decoration: none
+        }
+
+        html body a {
+            color: #08c;
+            text-decoration: none
+        }
+
+        html body a:hover {
+            color: #00a3f5;
+            text-decoration: none
+        }
+
+        html body img {
+            max-width: 100%
+        }
+
+        html body>p {
+            margin-top: 0;
+            margin-bottom: 16px;
+            word-wrap: break-word
+        }
+
+        html body>ul,
+        html body>ol {
+            margin-bottom: 16px
+        }
+
+        html body ul,
+        html body ol {
+            padding-left: 2em
+        }
+
+        html body ul.no-list,
+        html body ol.no-list {
+            padding: 0;
+            list-style-type: none
+        }
+
+        html body ul ul,
+        html body ul ol,
+        html body ol ol,
+        html body ol ul {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        html body li {
+            margin-bottom: 0
+        }
+
+        html body li.task-list-item {
+            list-style: none
+        }
+
+        html body li>p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        html body .task-list-item-checkbox {
+            margin: 0 .2em .25em -1.8em;
+            vertical-align: middle
+        }
+
+        html body .task-list-item-checkbox:hover {
+            cursor: pointer
+        }
+
+        html body blockquote {
+            margin: 16px 0;
+            font-size: inherit;
+            padding: 0 15px;
+            color: #5c5c5c;
+            background-color: #f0f0f0;
+            border-left: 4px solid #d6d6d6
+        }
+
+        html body blockquote>:first-child {
+            margin-top: 0
+        }
+
+        html body blockquote>:last-child {
+            margin-bottom: 0
+        }
+
+        html body hr {
+            height: 4px;
+            margin: 32px 0;
+            background-color: #d6d6d6;
+            border: 0 none
+        }
+
+        html body table {
+            margin: 10px 0 15px 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+            display: block;
+            width: 100%;
+            overflow: auto;
+            word-break: normal;
+            word-break: keep-all
+        }
+
+        html body table th {
+            font-weight: bold;
+            color: #000
+        }
+
+        html body table td,
+        html body table th {
+            border: 1px solid #d6d6d6;
+            padding: 6px 13px
+        }
+
+        html body dl {
+            padding: 0
+        }
+
+        html body dl dt {
+            padding: 0;
+            margin-top: 16px;
+            font-size: 1em;
+            font-style: italic;
+            font-weight: bold
+        }
+
+        html body dl dd {
+            padding: 0 16px;
+            margin-bottom: 16px
+        }
+
+        html body code {
+            font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+            font-size: .85em !important;
+            color: #000;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            padding: .2em 0
+        }
+
+        html body code::before,
+        html body code::after {
+            letter-spacing: -0.2em;
+            content: "\00a0"
+        }
+
+        html body pre>code {
+            padding: 0;
+            margin: 0;
+            font-size: .85em !important;
+            word-break: normal;
+            white-space: pre;
+            background: transparent;
+            border: 0
+        }
+
+        html body .highlight {
+            margin-bottom: 16px
+        }
+
+        html body .highlight pre,
+        html body pre {
+            padding: 1em;
+            overflow: auto;
+            font-size: .85em !important;
+            line-height: 1.45;
+            border: #d6d6d6;
+            border-radius: 3px
+        }
+
+        html body .highlight pre {
+            margin-bottom: 0;
+            word-break: normal
+        }
+
+        html body pre code,
+        html body pre tt {
+            display: inline;
+            max-width: initial;
+            padding: 0;
+            margin: 0;
+            overflow: initial;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0
+        }
+
+        html body pre code:before,
+        html body pre tt:before,
+        html body pre code:after,
+        html body pre tt:after {
+            content: normal
+        }
+
+        html body p,
+        html body blockquote,
+        html body ul,
+        html body ol,
+        html body dl,
+        html body pre {
+            margin-top: 0;
+            margin-bottom: 16px
+        }
+
+        html body kbd {
+            color: #000;
+            border: 1px solid #d6d6d6;
+            border-bottom: 2px solid #c7c7c7;
+            padding: 2px 4px;
+            background-color: #f0f0f0;
+            border-radius: 3px
+        }
+
+        @media print {
+            html body {
+                background-color: #fff
+            }
+
+            html body h1,
+            html body h2,
+            html body h3,
+            html body h4,
+            html body h5,
+            html body h6 {
+                color: #000;
+                page-break-after: avoid
+            }
+
+            html body blockquote {
+                color: #5c5c5c
+            }
+
+            html body pre {
+                page-break-inside: avoid
+            }
+
+            html body table {
+                display: table
+            }
+
+            html body img {
+                display: block;
+                max-width: 100%;
+                max-height: 100%
+            }
+
+            html body pre,
+            html body code {
+                word-wrap: break-word;
+                white-space: pre
+            }
+        }
+
+        .markdown-preview {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box
+        }
+
+        .markdown-preview .pagebreak,
+        .markdown-preview .newpage {
+            page-break-before: always
+        }
+
+        .markdown-preview pre.line-numbers {
+            position: relative;
+            padding-left: 3.8em;
+            counter-reset: linenumber
+        }
+
+        .markdown-preview pre.line-numbers>code {
+            position: relative
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows {
+            position: absolute;
+            pointer-events: none;
+            top: 1em;
+            font-size: 100%;
+            left: 0;
+            width: 3em;
+            letter-spacing: -1px;
+            border-right: 1px solid #999;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows>span {
+            pointer-events: none;
+            display: block;
+            counter-increment: linenumber
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows>span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: .8em;
+            text-align: right
+        }
+
+        .markdown-preview .mathjax-exps .MathJax_Display {
+            text-align: center !important
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .btn-group {
+            display: none
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .status {
+            display: none
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .output-div {
+            margin-bottom: 16px
+        }
+
+        .markdown-preview .md-toc {
+            padding: 0
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link {
+            display: inline;
+            padding: .25rem 0
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p,
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div {
+            display: inline
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link {
+            font-weight: 800
+        }
+
+        .scrollbar-style::-webkit-scrollbar {
+            width: 8px
+        }
+
+        .scrollbar-style::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: transparent
+        }
+
+        .scrollbar-style::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: rgba(150, 150, 150, 0.66);
+            border: 4px solid rgba(150, 150, 150, 0.66);
+            background-clip: content-box
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            overflow: auto
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+            position: relative;
+            top: 0
+        }
+
+        @media screen and (min-width:914px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                padding: 2em calc(50% - 457px + 2em)
+            }
+        }
+
+        @media screen and (max-width:914px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                padding: 2em
+            }
+        }
+
+        @media screen and (max-width:450px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                font-size: 14px !important;
+                padding: 1em
+            }
+        }
+
+        @media print {
+            html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+                display: none
+            }
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            font-size: 28px;
+            cursor: pointer;
+            color: inherit;
+            z-index: 99;
+            width: 32px;
+            text-align: center;
+            opacity: .4
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn {
+            opacity: 1
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            padding: 32px 0 48px 0;
+            font-size: 14px;
+            box-shadow: 0 0 4px rgba(150, 150, 150, 0.33);
+            box-sizing: border-box;
+            overflow: auto;
+            background-color: inherit
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar {
+            width: 8px
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: transparent
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: rgba(150, 150, 150, 0.66);
+            border: 4px solid rgba(150, 150, 150, 0.66);
+            background-clip: content-box
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a {
+            text-decoration: none
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc {
+            padding: 0 16px
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link {
+            display: inline;
+            padding: .25rem 0
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p,
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div {
+            display: inline
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link {
+            font-weight: 800
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+            left: 300px;
+            width: calc(100% - 300px);
+            padding: 2em calc(50% - 457px - 300px/2);
+            margin: 0;
+            box-sizing: border-box
+        }
+
+        @media screen and (max-width:1274px) {
+            html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+                padding: 2em
+            }
+        }
+
+        @media screen and (max-width:450px) {
+            html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+                width: 100%
+            }
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview {
+            left: 50%;
+            transform: translateX(-50%)
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc {
+            display: none
+        }
+
+        /* Please visit the URL below for more information: */
+        /*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+    </style>
+</head>
+
+<body>
+    <h1 id="factor3">factor3 因子报告</h1>
+<h2 id="ic">IC分析</h2>
+<h3 id="1d">1D</h3>
+<p><img alt="IC分布" src="IC/factor3_1D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2011</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">IC_mean</td>
+<td style="text-align: right;">-0.0083</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">-0.0105</td>
+<td style="text-align: right;">-0.0175</td>
+<td style="text-align: right;">0.0315</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_std</td>
+<td style="text-align: right;">0.3370</td>
+<td style="text-align: right;">0.3348</td>
+<td style="text-align: right;">0.3354</td>
+<td style="text-align: right;">0.3423</td>
+<td style="text-align: right;">0.3342</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_IR</td>
+<td style="text-align: right;">-0.0246</td>
+<td style="text-align: right;">0.0013</td>
+<td style="text-align: right;">-0.0313</td>
+<td style="text-align: right;">-0.0511</td>
+<td style="text-align: right;">0.0944</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5d">5D</h3>
+<p><img alt="IC分布" src="IC/factor3_5D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2011</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">IC_mean</td>
+<td style="text-align: right;">0.0118</td>
+<td style="text-align: right;">0.0208</td>
+<td style="text-align: right;">-0.0177</td>
+<td style="text-align: right;">0.0360</td>
+<td style="text-align: right;">-0.0587</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_std</td>
+<td style="text-align: right;">0.3303</td>
+<td style="text-align: right;">0.3497</td>
+<td style="text-align: right;">0.3224</td>
+<td style="text-align: right;">0.3238</td>
+<td style="text-align: right;">0.1614</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_IR</td>
+<td style="text-align: right;">0.0357</td>
+<td style="text-align: right;">0.0596</td>
+<td style="text-align: right;">-0.0549</td>
+<td style="text-align: right;">0.1113</td>
+<td style="text-align: right;">-0.3636</td>
+</tr>
+</tbody>
+</table>
+<h3 id="10d">10D</h3>
+<p><img alt="IC分布" src="IC/factor3_10D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2011</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">IC_mean</td>
+<td style="text-align: right;">0.0213</td>
+<td style="text-align: right;">0.0347</td>
+<td style="text-align: right;">0.0062</td>
+<td style="text-align: right;">0.0255</td>
+<td style="text-align: right;">-0.0481</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_std</td>
+<td style="text-align: right;">0.3405</td>
+<td style="text-align: right;">0.3582</td>
+<td style="text-align: right;">0.3251</td>
+<td style="text-align: right;">0.3428</td>
+<td style="text-align: right;">0.1583</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_IR</td>
+<td style="text-align: right;">0.0626</td>
+<td style="text-align: right;">0.0969</td>
+<td style="text-align: right;">0.0192</td>
+<td style="text-align: right;">0.0744</td>
+<td style="text-align: right;">-0.3040</td>
+</tr>
+</tbody>
+</table>
+<h3 id="20d">20D</h3>
+<p><img alt="IC分布" src="IC/factor3_20D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2011</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">IC_mean</td>
+<td style="text-align: right;">0.0317</td>
+<td style="text-align: right;">0.0397</td>
+<td style="text-align: right;">0.0206</td>
+<td style="text-align: right;">0.0348</td>
+<td style="text-align: right;">nan</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_std</td>
+<td style="text-align: right;">0.3491</td>
+<td style="text-align: right;">0.3716</td>
+<td style="text-align: right;">0.3389</td>
+<td style="text-align: right;">0.3369</td>
+<td style="text-align: right;">nan</td>
+</tr>
+<tr>
+<td style="text-align: left;">IC_IR</td>
+<td style="text-align: right;">0.0908</td>
+<td style="text-align: right;">0.1069</td>
+<td style="text-align: right;">0.0608</td>
+<td style="text-align: right;">0.1034</td>
+<td style="text-align: right;">nan</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<h2 id="_1">收益分析</h2>
+<h3 id="_2">分层收益</h3>
+<h3 id="1d_1">1D</h3>
+<p><img alt="分层净值" src="net_value/factor3_1D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">group5(long)</td>
+<td style="text-align: right;">-0.4789</td>
+<td style="text-align: right;">0.9228</td>
+<td style="text-align: right;">-0.6911</td>
+<td style="text-align: right;">-8.2377</td>
+<td style="text-align: right;">0.4689</td>
+<td style="text-align: right;">0.0336</td>
+<td style="text-align: right;">-0.0330</td>
+<td style="text-align: right;">1.0186</td>
+<td style="text-align: right;">0.6426</td>
+</tr>
+<tr>
+<td style="text-align: left;">group1(short)</td>
+<td style="text-align: right;">0.1292</td>
+<td style="text-align: right;">0.6821</td>
+<td style="text-align: right;">0.5083</td>
+<td style="text-align: right;">3.0065</td>
+<td style="text-align: right;">0.5095</td>
+<td style="text-align: right;">0.0334</td>
+<td style="text-align: right;">-0.0320</td>
+<td style="text-align: right;">1.0410</td>
+<td style="text-align: right;">0.6340</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2306</td>
+<td style="text-align: right;">0.6877</td>
+<td style="text-align: right;">-0.7398</td>
+<td style="text-align: right;">-5.3219</td>
+<td style="text-align: right;">0.4740</td>
+<td style="text-align: right;">0.0150</td>
+<td style="text-align: right;">-0.0151</td>
+<td style="text-align: right;">0.9887</td>
+<td style="text-align: right;">0.2952</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_excess</td>
+<td style="text-align: right;">-0.3212</td>
+<td style="text-align: right;">0.8398</td>
+<td style="text-align: right;">-0.3975</td>
+<td style="text-align: right;">-6.0725</td>
+<td style="text-align: right;">0.4842</td>
+<td style="text-align: right;">0.0287</td>
+<td style="text-align: right;">-0.0287</td>
+<td style="text-align: right;">1.0009</td>
+<td style="text-align: right;">0.5678</td>
+</tr>
+<tr>
+<td style="text-align: left;">short_excess</td>
+<td style="text-align: right;">-0.5073</td>
+<td style="text-align: right;">0.9243</td>
+<td style="text-align: right;">-0.9399</td>
+<td style="text-align: right;">-8.7121</td>
+<td style="text-align: right;">0.4778</td>
+<td style="text-align: right;">0.0283</td>
+<td style="text-align: right;">-0.0300</td>
+<td style="text-align: right;">0.9430</td>
+<td style="text-align: right;">0.5753</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_short</td>
+<td style="text-align: right;">-0.6987</td>
+<td style="text-align: right;">0.9897</td>
+<td style="text-align: right;">-0.8287</td>
+<td style="text-align: right;">-11.2070</td>
+<td style="text-align: right;">0.4791</td>
+<td style="text-align: right;">0.0458</td>
+<td style="text-align: right;">-0.0480</td>
+<td style="text-align: right;">0.9550</td>
+<td style="text-align: right;">0.9248</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5d_1">5D</h3>
+<p><img alt="分层净值" src="net_value/factor3_5D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">group5(long)</td>
+<td style="text-align: right;">-0.1417</td>
+<td style="text-align: right;">0.6767</td>
+<td style="text-align: right;">-0.3930</td>
+<td style="text-align: right;">-3.3238</td>
+<td style="text-align: right;">0.4637</td>
+<td style="text-align: right;">0.0150</td>
+<td style="text-align: right;">-0.0138</td>
+<td style="text-align: right;">1.0869</td>
+<td style="text-align: right;">0.2854</td>
+</tr>
+<tr>
+<td style="text-align: left;">group1(short)</td>
+<td style="text-align: right;">-0.2034</td>
+<td style="text-align: right;">0.7770</td>
+<td style="text-align: right;">-0.6259</td>
+<td style="text-align: right;">-4.1557</td>
+<td style="text-align: right;">0.4777</td>
+<td style="text-align: right;">0.0148</td>
+<td style="text-align: right;">-0.0149</td>
+<td style="text-align: right;">0.9908</td>
+<td style="text-align: right;">0.2942</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2209</td>
+<td style="text-align: right;">0.6523</td>
+<td style="text-align: right;">-1.8139</td>
+<td style="text-align: right;">-5.3764</td>
+<td style="text-align: right;">0.4637</td>
+<td style="text-align: right;">0.0063</td>
+<td style="text-align: right;">-0.0072</td>
+<td style="text-align: right;">0.8718</td>
+<td style="text-align: right;">0.1327</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_excess</td>
+<td style="text-align: right;">0.1025</td>
+<td style="text-align: right;">0.3058</td>
+<td style="text-align: right;">0.5161</td>
+<td style="text-align: right;">5.3233</td>
+<td style="text-align: right;">0.4841</td>
+<td style="text-align: right;">0.0132</td>
+<td style="text-align: right;">-0.0114</td>
+<td style="text-align: right;">1.1579</td>
+<td style="text-align: right;">0.2491</td>
+</tr>
+<tr>
+<td style="text-align: left;">short_excess</td>
+<td style="text-align: right;">-0.0874</td>
+<td style="text-align: right;">0.6060</td>
+<td style="text-align: right;">-0.2141</td>
+<td style="text-align: right;">-2.2907</td>
+<td style="text-align: right;">0.4968</td>
+<td style="text-align: right;">0.0131</td>
+<td style="text-align: right;">-0.0134</td>
+<td style="text-align: right;">0.9790</td>
+<td style="text-align: right;">0.2641</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_short</td>
+<td style="text-align: right;">-0.0104</td>
+<td style="text-align: right;">0.6183</td>
+<td style="text-align: right;">0.1772</td>
+<td style="text-align: right;">-0.2664</td>
+<td style="text-align: right;">0.4981</td>
+<td style="text-align: right;">0.0207</td>
+<td style="text-align: right;">-0.0199</td>
+<td style="text-align: right;">1.0364</td>
+<td style="text-align: right;">0.4062</td>
+</tr>
+</tbody>
+</table>
+<h3 id="10d_1">10D</h3>
+<p><img alt="分层净值" src="net_value/factor3_10D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">group5(long)</td>
+<td style="text-align: right;">-0.0950</td>
+<td style="text-align: right;">0.6308</td>
+<td style="text-align: right;">-0.3790</td>
+<td style="text-align: right;">-2.3920</td>
+<td style="text-align: right;">0.4577</td>
+<td style="text-align: right;">0.0110</td>
+<td style="text-align: right;">-0.0098</td>
+<td style="text-align: right;">1.1157</td>
+<td style="text-align: right;">0.2071</td>
+</tr>
+<tr>
+<td style="text-align: left;">group1(short)</td>
+<td style="text-align: right;">-0.2532</td>
+<td style="text-align: right;">0.7866</td>
+<td style="text-align: right;">-1.3064</td>
+<td style="text-align: right;">-5.1108</td>
+<td style="text-align: right;">0.4615</td>
+<td style="text-align: right;">0.0103</td>
+<td style="text-align: right;">-0.0108</td>
+<td style="text-align: right;">0.9513</td>
+<td style="text-align: right;">0.2070</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2138</td>
+<td style="text-align: right;">0.6344</td>
+<td style="text-align: right;">-2.5298</td>
+<td style="text-align: right;">-5.3495</td>
+<td style="text-align: right;">0.4154</td>
+<td style="text-align: right;">0.0048</td>
+<td style="text-align: right;">-0.0050</td>
+<td style="text-align: right;">0.9563</td>
+<td style="text-align: right;">0.0933</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_excess</td>
+<td style="text-align: right;">0.1516</td>
+<td style="text-align: right;">0.2233</td>
+<td style="text-align: right;">0.8689</td>
+<td style="text-align: right;">10.7780</td>
+<td style="text-align: right;">0.5064</td>
+<td style="text-align: right;">0.0095</td>
+<td style="text-align: right;">-0.0085</td>
+<td style="text-align: right;">1.1200</td>
+<td style="text-align: right;">0.1813</td>
+</tr>
+<tr>
+<td style="text-align: left;">short_excess</td>
+<td style="text-align: right;">0.0170</td>
+<td style="text-align: right;">0.4232</td>
+<td style="text-align: right;">0.1837</td>
+<td style="text-align: right;">0.6381</td>
+<td style="text-align: right;">0.5269</td>
+<td style="text-align: right;">0.0091</td>
+<td style="text-align: right;">-0.0099</td>
+<td style="text-align: right;">0.9241</td>
+<td style="text-align: right;">0.1872</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_short</td>
+<td style="text-align: right;">0.1596</td>
+<td style="text-align: right;">0.3888</td>
+<td style="text-align: right;">0.6477</td>
+<td style="text-align: right;">6.5174</td>
+<td style="text-align: right;">0.5321</td>
+<td style="text-align: right;">0.0147</td>
+<td style="text-align: right;">-0.0151</td>
+<td style="text-align: right;">0.9745</td>
+<td style="text-align: right;">0.2964</td>
+</tr>
+</tbody>
+</table>
+<h3 id="20d_1">20D</h3>
+<p><img alt="分层净值" src="net_value/factor3_20D.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">group5(long)</td>
+<td style="text-align: right;">-0.1131</td>
+<td style="text-align: right;">0.5919</td>
+<td style="text-align: right;">-0.7329</td>
+<td style="text-align: right;">-3.0326</td>
+<td style="text-align: right;">0.4377</td>
+<td style="text-align: right;">0.0080</td>
+<td style="text-align: right;">-0.0070</td>
+<td style="text-align: right;">1.1433</td>
+<td style="text-align: right;">0.1487</td>
+</tr>
+<tr>
+<td style="text-align: left;">group1(short)</td>
+<td style="text-align: right;">-0.2924</td>
+<td style="text-align: right;">0.7678</td>
+<td style="text-align: right;">-2.1901</td>
+<td style="text-align: right;">-6.0463</td>
+<td style="text-align: right;">0.3844</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">-0.0074</td>
+<td style="text-align: right;">1.1377</td>
+<td style="text-align: right;">0.1526</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2019</td>
+<td style="text-align: right;">0.6130</td>
+<td style="text-align: right;">-3.3374</td>
+<td style="text-align: right;">-5.2276</td>
+<td style="text-align: right;">0.3831</td>
+<td style="text-align: right;">0.0034</td>
+<td style="text-align: right;">-0.0035</td>
+<td style="text-align: right;">0.9591</td>
+<td style="text-align: right;">0.0669</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_excess</td>
+<td style="text-align: right;">0.1114</td>
+<td style="text-align: right;">0.1913</td>
+<td style="text-align: right;">0.8727</td>
+<td style="text-align: right;">9.2457</td>
+<td style="text-align: right;">0.5013</td>
+<td style="text-align: right;">0.0069</td>
+<td style="text-align: right;">-0.0061</td>
+<td style="text-align: right;">1.1441</td>
+<td style="text-align: right;">0.1308</td>
+</tr>
+<tr>
+<td style="text-align: left;">short_excess</td>
+<td style="text-align: right;">0.1070</td>
+<td style="text-align: right;">0.2983</td>
+<td style="text-align: right;">0.8132</td>
+<td style="text-align: right;">5.6920</td>
+<td style="text-align: right;">0.5688</td>
+<td style="text-align: right;">0.0063</td>
+<td style="text-align: right;">-0.0074</td>
+<td style="text-align: right;">0.8633</td>
+<td style="text-align: right;">0.1365</td>
+</tr>
+<tr>
+<td style="text-align: left;">long_short</td>
+<td style="text-align: right;">0.2227</td>
+<td style="text-align: right;">0.2617</td>
+<td style="text-align: right;">1.0265</td>
+<td style="text-align: right;">13.5076</td>
+<td style="text-align: right;">0.5247</td>
+<td style="text-align: right;">0.0111</td>
+<td style="text-align: right;">-0.0104</td>
+<td style="text-align: right;">1.0693</td>
+<td style="text-align: right;">0.2193</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<h3 id="_3">因子加权日频收益</h3>
+<p><img alt="因子加权净值" src="net_value/factor3_factor_weighted.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">factor_weighted</td>
+<td style="text-align: right;">-0.3576</td>
+<td style="text-align: right;">0.8221</td>
+<td style="text-align: right;">-0.4124</td>
+<td style="text-align: right;">-6.9058</td>
+<td style="text-align: right;">0.4814</td>
+<td style="text-align: right;">0.0225</td>
+<td style="text-align: right;">-0.0229</td>
+<td style="text-align: right;">0.9851</td>
+<td style="text-align: right;">0.6200</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2362</td>
+<td style="text-align: right;">0.6918</td>
+<td style="text-align: right;">-0.7668</td>
+<td style="text-align: right;">-5.4201</td>
+<td style="text-align: right;">0.4724</td>
+<td style="text-align: right;">0.0149</td>
+<td style="text-align: right;">-0.0151</td>
+<td style="text-align: right;">0.9909</td>
+<td style="text-align: right;">0.2946</td>
+</tr>
+<tr>
+<td style="text-align: left;">excess</td>
+<td style="text-align: right;">-0.1651</td>
+<td style="text-align: right;">0.6250</td>
+<td style="text-align: right;">-0.0534</td>
+<td style="text-align: right;">-4.1934</td>
+<td style="text-align: right;">0.4698</td>
+<td style="text-align: right;">0.0159</td>
+<td style="text-align: right;">-0.0143</td>
+<td style="text-align: right;">1.1106</td>
+<td style="text-align: right;">0.5635</td>
+</tr>
+</tbody>
+</table>
+<h3 id="08-10">单因子策略(0.8, 1.0)收益</h3>
+<p><img alt="单因子策略(0.8, 1.0)净值" src="net_value/factor3_quantile.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">ann_ret</th>
+<th style="text-align: right;">max_dd</th>
+<th style="text-align: right;">ann_sharpe</th>
+<th style="text-align: right;">ann_calmar</th>
+<th style="text-align: right;">win_rate</th>
+<th style="text-align: right;">avg_win_ret</th>
+<th style="text-align: right;">avg_loss_ret</th>
+<th style="text-align: right;">profit_loss_ratio</th>
+<th style="text-align: right;">ann_vol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">strategy</td>
+<td style="text-align: right;">-0.1794</td>
+<td style="text-align: right;">0.7994</td>
+<td style="text-align: right;">0.2259</td>
+<td style="text-align: right;">-3.5633</td>
+<td style="text-align: right;">0.4814</td>
+<td style="text-align: right;">0.0365</td>
+<td style="text-align: right;">-0.0323</td>
+<td style="text-align: right;">1.1320</td>
+<td style="text-align: right;">0.9459</td>
+</tr>
+<tr>
+<td style="text-align: left;">benchmark</td>
+<td style="text-align: right;">-0.2362</td>
+<td style="text-align: right;">0.6918</td>
+<td style="text-align: right;">-0.7668</td>
+<td style="text-align: right;">-5.4201</td>
+<td style="text-align: right;">0.4724</td>
+<td style="text-align: right;">0.0149</td>
+<td style="text-align: right;">-0.0151</td>
+<td style="text-align: right;">0.9909</td>
+<td style="text-align: right;">0.2946</td>
+</tr>
+<tr>
+<td style="text-align: left;">excess</td>
+<td style="text-align: right;">0.0720</td>
+<td style="text-align: right;">0.6597</td>
+<td style="text-align: right;">0.4856</td>
+<td style="text-align: right;">1.7321</td>
+<td style="text-align: right;">0.5071</td>
+<td style="text-align: right;">0.0309</td>
+<td style="text-align: right;">-0.0282</td>
+<td style="text-align: right;">1.0941</td>
+<td style="text-align: right;">0.9058</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<h2 id="_4">换手率分析</h2>
+<h3 id="_5">分层换手率</h3>
+<p><img alt="分层换手率分布" src="turnover/factor3_group.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">turnover_count</th>
+<th style="text-align: right;">turnover_mean</th>
+<th style="text-align: right;">turnover_std</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">group_1</td>
+<td style="text-align: right;">766.0000</td>
+<td style="text-align: right;">0.8185</td>
+<td style="text-align: right;">0.2406</td>
+</tr>
+<tr>
+<td style="text-align: left;">group_2</td>
+<td style="text-align: right;">775.0000</td>
+<td style="text-align: right;">0.8103</td>
+<td style="text-align: right;">0.2428</td>
+</tr>
+<tr>
+<td style="text-align: left;">group_3</td>
+<td style="text-align: right;">767.0000</td>
+<td style="text-align: right;">0.7920</td>
+<td style="text-align: right;">0.2466</td>
+</tr>
+<tr>
+<td style="text-align: left;">group_4</td>
+<td style="text-align: right;">764.0000</td>
+<td style="text-align: right;">0.8148</td>
+<td style="text-align: right;">0.2416</td>
+</tr>
+<tr>
+<td style="text-align: left;">group_5</td>
+<td style="text-align: right;">762.0000</td>
+<td style="text-align: right;">0.8340</td>
+<td style="text-align: right;">0.2356</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<h3 id="_6">因子加权持仓换手率</h3>
+<p><img alt="因子加权持仓换手率" src="turnover/factor3_factor_weighted.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">turnover_count</th>
+<th style="text-align: right;">turnover_mean</th>
+<th style="text-align: right;">turnover_std</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">factor_weighted</td>
+<td style="text-align: right;">37.0000</td>
+<td style="text-align: right;">0.7032</td>
+<td style="text-align: right;">0.1959</td>
+</tr>
+</tbody>
+</table>
+<h3 id="08-10_1">单因子策略(0.8, 1.0)换手率</h3>
+<p><img alt="单因子策略(0.8, 1.0)换手率" src="turnover/factor3_quantile.svg"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">turnover_count</th>
+<th style="text-align: right;">turnover_mean</th>
+<th style="text-align: right;">turnover_std</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">strategy</td>
+<td style="text-align: right;">37.0000</td>
+<td style="text-align: right;">0.7191</td>
+<td style="text-align: right;">0.2567</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+</body>
+
+</html>

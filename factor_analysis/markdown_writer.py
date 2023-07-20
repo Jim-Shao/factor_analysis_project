@@ -10,6 +10,7 @@ import os
 import asyncio
 import subprocess
 import markdown
+import winreg
 import pandas as pd
 from bs4 import BeautifulSoup
 from pyppeteer import launch
@@ -33,19 +34,16 @@ def get_chrome_executable_path():
                 if chrome_path:
                     return chrome_path
         except subprocess.CalledProcessError:
-            pass
+            return None
     elif os.name == 'nt':  # Windows
         # 尝试查找Chrome执行文件
+        CHROME_REG = r"SOFTWARE\Clients\StartMenuInternet\Google Chrome\DefaultIcon"
         try:
-            chrome_path = subprocess.check_output(['where',
-                                                   'chrome']).decode().strip()
-            if chrome_path:
-                return chrome_path
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, CHROME_REG)
+            value, _type = winreg.QueryValueEx(key, "")
+            return value.split(',')[0]
         except subprocess.CalledProcessError:
-            pass
-
-    # 如果在上述系统中未找到Chrome执行文件，返回None
-    return None
+            return None
 
 
 def markdown_to_html(markdown_path, html_template_path=None):

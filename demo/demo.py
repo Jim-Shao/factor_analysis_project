@@ -46,7 +46,7 @@ if __name__ == '__main__':
     factor_backtest = FactorBacktest(
         bar_df=stock_bar_df,  # <后复权>行情数据
         factor_df=stock_bar_df[['open']] + 1,  # 计算好的因子数据，可直接传入
-        # factor_expressions=expressions,  # 需要计算的因子表达式
+        factor_expressions=expressions,  # 需要计算的因子表达式
         benchmark_df=None,  # 基准数据，比如沪深300，如果不提供代表每天等权持仓且日度换仓
         forward_periods=[1, 5, 10, 20],  # 预测未来收益的时间跨度
         position_adjust_datetimes=position_dates,  # 调仓日期
@@ -54,6 +54,6 @@ if __name__ == '__main__':
         choice=(0.8, 1.0),  # 单因子策略根据因子值的选股范围
         output_dir=None,  # 回测结果输出路径
         n_groups=5,  # 分组数
-        n_jobs=5,  # 并行计算的进程数
+        n_jobs=1,  # 并行计算的进程数
     )
     factor_backtest.run(try_optimize=True)  # 运行回测，并且进行组合优化

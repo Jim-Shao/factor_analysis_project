@@ -1,11 +1,11 @@
 # factor_analysis 因子回测报告生成工具
 
 ## 1. 介绍
-该工具用于生成Markdown格式的因子回测报告（[点击查看示例报告](/factor_analysis_output/factor1/factor1_report.md)）
+该工具用于生成Markdown与pdf格式的因子回测报告
 
 功能：
 1. 因子多周期IC分析
-2. 因子收益分析（分层、因子值加权、指定quantile组）
+2. 因子收益分析（分层、因子值加权、单因子策略指定quantile或前几支）
 3. 因子换手率分析
 4. 多因子相关性分析
 5. 因子组合优化
@@ -23,6 +23,7 @@
 ## 2. 安装
 - 编译环境
     - Python >= 3.7
+    - Google Chrome (用于生成pdf报告，如果未安装，运行程序时会自动安装浏览器)
 
 - 第三方依赖
     - pandas == 1.3.5
@@ -32,6 +33,9 @@
     - tqdm == 4.59.0
     - scipy == 1.6.2
     - tabulate == 0.9.0
+    - markdown == 3.4.3
+    - pyppeteer == 1.0.2
+    - bs4 == 0.0.1
 
 - 如何安装
 
@@ -68,6 +72,6 @@
 
 1. 回测对于传入的数据格式有一定要求，主要在于pd.DataFrame或pd.Series的索引为
 ```MultiIndex['datetime'(level=0, DatetimeIndex), 'order_book_id'(level=1, Index)]```
-2. 多进程模式在windows下运行会出现异常（单进程模式正常），建议在linux下运行多进程模式
+2. 多进程模式在Windows下运行会出现异常（单进程模式正常），建议在Linux下运行多进程模式
 
 

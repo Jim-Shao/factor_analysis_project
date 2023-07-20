@@ -250,6 +250,7 @@ class Factor:
         factor_weighted_positions.loc[self.position_adjust_datetimes[
             0]] = positions.loc[self.position_adjust_datetimes[0]]
 
+        self.factor_weighted_net_value_base = periodic_net_value_base
         self.total_factor_weighted_net_values = total_net_values
         self.factor_weighted_positions = factor_weighted_positions
 
@@ -269,6 +270,7 @@ class Factor:
                                                                             -1]
         periodic_weighted_net_values_sum = periodic_weighted_net_values.abs(
         ).sum(axis=1)
+        periodic_weighted_net_values_sum.iloc[-1] = np.nan  # 最后一天的净值不计算
         periodic_weighted_net_values_sum.name = 'weighted_net_value'
         periodic_weighted_net_values_sum = periodic_weighted_net_values_sum.to_frame(
         )
@@ -301,6 +303,7 @@ class Factor:
         quantile_positions.loc[self.position_adjust_datetimes[
             0]] = positions.loc[self.position_adjust_datetimes[0]]
 
+        self.quantile_net_value_base = periodic_net_value_base
         self.total_quantile_net_values = total_net_values
         self.quantile_positions = quantile_positions
 
@@ -341,18 +344,15 @@ class Factor:
 
     def calc_factor_weighted_turnover(self) -> None:
         """计算因子加权持仓换手率"""
-        forward_return_1D = (self.forward_return_df['1D'].unstack() +
-                             1).cumprod()
-        forward_return = forward_return_1D.loc[
-            self.position_adjust_datetimes].pct_change() + 1
-
-        chg_value = self._factor_weighted_positions.unstack().diff().abs()
-        chg_value_adjusted = chg_value * forward_return
-        total_value = self._factor_weighted_positions.unstack().abs()
-        total_value_adjusted = total_value * forward_return
-
-        factor_weighted_turnover = chg_value_adjusted.sum(
-            axis=1) / total_value_adjusted.sum(axis=1)
+        factor_weighted_positions = self._factor_weighted_positions.unstack()
+        net_value_base = self.factor_weighted_net_value_base.loc[
+            self.position_adjust_datetimes]
+        factor_weighted_net_values = pd.DataFrame()
+        for col in factor_weighted_positions.columns:
+            factor_weighted_net_values[col] = factor_weighted_positions[
+                col] * net_value_base['weighted_net_value']
+        factor_weighted_turnover = factor_weighted_net_values.diff().abs().sum(
+            axis=1) / factor_weighted_net_values.abs().sum(axis=1)
         factor_weighted_turnover = factor_weighted_turnover.to_frame()
         factor_weighted_turnover.columns = ['turnover']
         factor_weighted_turnover /= 2
@@ -362,18 +362,15 @@ class Factor:
 
     def calc_quantile_turnover(self) -> None:
         """计算单因子策略持仓换手率"""
-        forward_return_1D = (self.forward_return_df['1D'].unstack() +
-                             1).cumprod()
-        forward_return = forward_return_1D.loc[
-            self.position_adjust_datetimes].pct_change() + 1
-
-        chg_value = self._quantile_positions.unstack().diff().abs()
-        chg_value_adjusted = chg_value * forward_return
-        total_value = self._quantile_positions.unstack().abs()
-        total_value_adjusted = total_value * forward_return
-
-        quantile_turnover = chg_value_adjusted.sum(
-            axis=1) / total_value_adjusted.sum(axis=1)
+        quantile_positions = self._quantile_positions.unstack()
+        net_value_base = self.quantile_net_value_base.loc[
+            self.position_adjust_datetimes]
+        quantile_net_values = pd.DataFrame()
+        for col in quantile_positions.columns:
+            quantile_net_values[col] = quantile_positions[
+                col] * net_value_base['weighted_net_value']
+        quantile_turnover = quantile_net_values.diff().abs().sum(
+            axis=1) / quantile_net_values.abs().sum(axis=1)
         quantile_turnover = quantile_turnover.to_frame()
         quantile_turnover.columns = ['turnover']
         quantile_turnover /= 2
@@ -715,10 +712,8 @@ class Factor:
     def plot_turnover(self):
         """绘制换手率图"""
         self.plot_group_turnover()
-        self.md_writer.add_pagebreak()
         self.plot_factor_weighted_turnover()
         self.plot_quantile_turnover()
-        self.md_writer.add_pagebreak()
 
     def report_group_turnover(self):
         """生成分组换手率报告至Markdown"""
@@ -757,5 +752,7 @@ class Factor:
         """生成换手率报告至Markdown"""
         self.md_writer.add_title('换手率分析', 2)
         self.report_group_turnover()
+        self.md_writer.add_pagebreak()
         self.report_factor_weighted_turnover()
         self.report_quantile_turnover()
+        self.md_writer.add_pagebreak()
