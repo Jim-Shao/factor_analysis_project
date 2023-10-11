@@ -7,7 +7,10 @@
 '''
 
 import os
+import sys
 import time
+import json
+import copy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,12 +19,12 @@ import seaborn as sns
 from multiprocessing import Manager, Process, Queue
 from typing import Union, List, Dict, Tuple
 from tqdm import tqdm
-from itertools import combinations
 
-from factor_analysis.utils import assert_std_index, calc_return
+from factor_analysis.utils import assert_std_index, assert_index_equal, calc_return
 from factor_analysis.factor import Factor
 from factor_analysis.factor_calc import CalcPool
 from factor_analysis.postprocess import Postprocess, PostprocessQueue
+from factor_analysis.optimize import FactorOptimizer
 
 
 def _analyze_shared(factor: Factor, shared_list: List[Factor], queue: Queue):
@@ -32,18 +35,10 @@ def _analyze_shared(factor: Factor, shared_list: List[Factor], queue: Queue):
     queue.put(os.getpid())
 
 
-def _analyze_quantile_shared(factor: Factor, shared_list: List[Factor],
-                             queue: Queue):
-    """多进程实现Factor.analyze_quantile()的辅助函数，用于将Factor对象存入共享列表中
-    ，并将进程号存入队列中"""
-    factor.analyze_quantile()
-    shared_list.append(factor)
-    queue.put(os.getpid())
-
-
 class FactorBacktest:
     def __init__(
         self,
+        universe: str,
         bar_df: pd.DataFrame,
         factor_df: pd.DataFrame = None,
         factor_expressions: Union[List[str], Dict[str, str]] = None,
@@ -52,6 +47,7 @@ class FactorBacktest:
         position_adjust_datetimes: List[pd.Timestamp] = None,
         postprocess_queue: PostprocessQueue = None,
         choice: Union[Tuple[float, float], int] = (0.8, 1.0),
+        analyze_fields: List[str] = ['IC', 'return', 'turnover'],
         output_dir: str = None,
         n_groups: int = 5,
         n_jobs: int = 1,
@@ -60,11 +56,13 @@ class FactorBacktest:
 
         Parameters
         ----------
+        universe : str
+            股票池名称，比如全A股或者沪深300等
         bar_df : pd.DataFrame
             <后复权>行情数据，multi-index[datetime, order_book_id]，columns=['open', 'high', 'low', 'close', 'volume', ...]
             其中除必须包含的开高低收量之外，还可以包含其他任意列，这些列都可用于用于计算因子
         factor_df : pd.DataFrame, optional
-            因子数据，multi-index[datetime, symbol]，columns=['factor1', 'factor2', ...]，默认为None，但是不能和factor_expressions同时为None
+            因子数据，multi-index[datetime, order_book_id]，columns=['factor1', 'factor2', ...]，默认为None，但是不能和factor_expressions同时为None
         factor_expressions : Union[List[str], Dict[str, str]], optional
             因子表达式，可以是一个列表，也可以是一个字典；
             列表中的每个元素都是一个因子表达式，例：['(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))']，会自动命名为factor1、factor2、...；
@@ -72,7 +70,7 @@ class FactorBacktest:
             关于可以使用哪些函数和变量，请参考factor_analysis.factor_calc文件；
             默认为None，但是不能和factor_df同时为None
         benchmark_df : pd.DataFrame, optional
-            基准数据，multi-index[datetime, symbol]，columns=['open', 'high', 'low', 'close', 'volume', ...]，默认为None；
+            基准数据，multi-index[datetime, order_book_id]，columns=['open', 'high', 'low', 'close', 'volume', ...]，默认为None；
             如果为None，表示基准为每天等权持仓所有股票，日度换仓；
         forward_periods : Union[int, List[int]], optional
             前瞻期数，可以是一个整数，也可以是一个整数列表，默认为[1, 5, 10, 20]
@@ -85,6 +83,8 @@ class FactorBacktest:
             用于单因子回测的分位数选择，可以是一个元组，也可以是一个整数，默认为(0.8, 1.0)；
             例：(0.8, 1,0)即为每次换仓时，选择因子值处于80%~100%分位数的股票等权买入作为多头；
             当为整数时，表示每次换仓时，选择因子值处于前choice名的股票等权买入作为多头；
+        analyze_fields : List[str]
+            因子分析时需要分析的部分，可以是['IC', 'return', 'turnover']中的任意组合
         output_dir : str, optional
             回测结果输出目录，默认为None，表示在当前目录下创建一个factor_analysis_output文件夹
         n_groups : int, optional
@@ -93,26 +93,43 @@ class FactorBacktest:
             多进程数量，默认为1，表示单进程运行，如果为-1，则使用所有可用的CPU核心数
         """
         assert_std_index(bar_df, 'bar_df', 'df')
+        if benchmark_df is not None:
+            assert_std_index(benchmark_df, 'benchmark_df', 'df')
+        if factor_df is not None:
+            assert_std_index(factor_df, 'factor_df', 'df')
+            assert_index_equal(bar_df, factor_df, 'bar_df', 'factor_df')
 
+        self.universe = universe
         self.bar_df = bar_df.sort_index()
         self.forward_periods = forward_periods
         self.benchmark_df = benchmark_df
         self.n_groups = n_groups
-        self.postprocess_queue = postprocess_queue
         self.choice = choice
+        self.analyze_fields = analyze_fields
+        self.trading_dates = self.bar_df.index.get_level_values(
+            'datetime').unique()
+
+        # 因子后处理步骤队列
+        if postprocess_queue is not None:
+            self.postprocess_queue = postprocess_queue
+        else:
+            self.postprocess_queue = PostprocessQueue()
 
         # 检验调仓日是否全都为交易日
         if position_adjust_datetimes is not None:
             position_adjust_datetimes = pd.to_datetime(
                 position_adjust_datetimes)
             is_trading_days = position_adjust_datetimes.isin(
-                self.bar_df.index.get_level_values('datetime'))
+                self.trading_dates)
             if not is_trading_days.all():
                 error_datetimes = position_adjust_datetimes[
                     ~is_trading_days].tolist()
                 raise ValueError(
                     f"position_adjust_datetimes must be trading days, but {error_datetimes} are not"
                 )
+        else:
+            position_adjust_datetimes = self.bar_df.index.get_level_values(
+                'datetime').unique().tolist()
         self.position_adjust_datetimes = position_adjust_datetimes
 
         # 因子数据
@@ -151,27 +168,68 @@ class FactorBacktest:
         self.manager = Manager()
         self.name_space = self.manager.Namespace()
 
-    def run(self, try_optimize: bool = True):
+        # 记录参数
+        self.config = {}
+        self.config['universe'] = self.universe
+        self.config['datetime_range'] = (
+            self.trading_dates.min().strftime('%Y-%m-%d'),
+            self.trading_dates.max().strftime('%Y-%m-%d'))
+        self.config['analyze_fields'] = self.analyze_fields
+        self.config['forward_periods'] = self.forward_periods
+        self.config['choice'] = self.choice
+        self.config['n_groups'] = self.n_groups
+        self.config['n_jobs'] = self.n_jobs
+        self.config['postprocess_queue'] = self.postprocess_queue.info
+        self.config['factor_expressions'] = self.factor_expressions
+        self.config['position_adjust_datetimes'] = [
+            dt.strftime('%Y-%m-%d') for dt in self.position_adjust_datetimes
+        ]
+
+        # 导出参数为JSON文件
+        self.config_path = os.path.join(self.output_dir, universe,
+                                        'config.json')
+        os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4, ensure_ascii=False)
+
+    def run(self, try_optimize: bool = True, auto_standardize: bool = True):
         """运行回测
 
         Parameters
         ----------
         try_optimize : bool, optional
-            是否尝试优化，如果为True，则会尝试将已有因子进行相加组合，以寻找更好的因子，如果为False，则不会进行优化，默认为True
+            是否尝试优化，如果为True，则会尝试将已有因子进行相加组合，以寻找更好的因子，
+            如果为False，则不会进行优化，默认为True
+        auto_standardize : bool, optional
+            优化时是否自动进行截面标准化，默认为True
         """
-        print(f'\n{"*"*30} Factor Analysis (n_jobs={self.n_jobs}) {"*"*30}')
+        try:
+            terminal_width = os.get_terminal_size().columns
+        except OSError:
+            terminal_width = 80
+        text = ' Factor Analysis '
+        padding_len = (terminal_width - len(text)) // 2
+        print(f'\n{"*"*padding_len}{text}{"*"*padding_len}')
+        print(f"### Backtest config: universe={self.universe}, "
+              f"datetime_range={self.config['datetime_range']}, "
+              f"n_jobs={self.n_jobs}")
         start = time.time()
         if self.factor_expressions:
             self.calc_factors()  # 计算因子
         self.calc_forward_returns()  # 计算前瞻收益
+        self.calc_periodic_net_values()  # 计算阶段净值
 
         self.factor_list: List[Factor] = []
         for factor_name, factor_series in self._factor_df.iteritems():
             factor = Factor(
                 name=factor_name,
+                universe=self.universe,
+                fields=self.analyze_fields,
                 factor_series=factor_series,
                 forward_return_df=self.forward_return_df,
                 bench_forward_return_df=self.bench_return_df,
+                group_periodic_net_values=self.group_periodic_net_values,
+                periodic_net_values=self.periodic_net_values,
                 position_adjust_datetimes=self.position_adjust_datetimes,
                 n_group=self.n_groups,
                 quantile=self.choice,
@@ -183,25 +241,64 @@ class FactorBacktest:
         self.plot_corr()  # 绘制因子相关性热力图
 
         if try_optimize is True:
-            self.optimize_combination()  # 优化因子组合
-        print(f">>> Output directory: {self.output_dir}")
+            self.optimize_combination(
+                auto_standardize=auto_standardize)  # 优化因子组合
+        print(
+            f">>> Output directory: {os.path.join(self.output_dir, self.universe)}"
+        )
         end = time.time()
-        print(f">>> Total time for running: {end-start:.2f}s")
+        print(f">>> Total time for running backtest: {end-start:.2f}s")
+        print(f'{"*"*terminal_width}\n')
 
     @property
     def factor_df(self) -> pd.DataFrame:
+        """因子数据"""
         if self._factor_df.columns.tolist() == self.factor_names:
             return self._factor_df
         else:
             self.calc_factors()
             return self._factor_df.copy()
 
+    def calc_periodic_net_values(self):
+        """计算阶段净值"""
+        print(">>> Calculating periodic net values:", end=' ')
+        sys.stdout.flush()
+        start_time = time.time()
+
+        self.group_periodic_net_values = {}
+        for period in self.forward_periods:
+            position_adjust_datetimes = self.trading_dates[::period]
+            returns = self.forward_return_df['1D'].unstack()
+            returns.loc[position_adjust_datetimes,
+                        'adjust_datetime'] = position_adjust_datetimes
+            returns['adjust_datetime'] = returns['adjust_datetime'].ffill(
+            ).fillna(returns.index[0])
+            periodic_net_values = returns.groupby('adjust_datetime').apply(
+                lambda x: (x.drop(columns='adjust_datetime') + 1).cumprod())
+            # 最后一天用倒数第二天填充，因为最后一天的收益是无法计算的
+            periodic_net_values.iloc[-1] = periodic_net_values.iloc[-2]
+            self.group_periodic_net_values[period] = periodic_net_values
+
+        returns = self.forward_return_df['1D'].unstack()
+        returns.loc[self.position_adjust_datetimes,
+                    'adjust_datetime'] = self.position_adjust_datetimes
+        returns['adjust_datetime'] = returns['adjust_datetime'].ffill().fillna(
+            returns.index[0])
+        periodic_net_values = returns.groupby('adjust_datetime').apply(
+            lambda x: (x.drop(columns='adjust_datetime') + 1).cumprod())
+        # 最后一天用倒数第二天填充，因为最后一天的收益是无法计算的
+        periodic_net_values.iloc[-1] = periodic_net_values.iloc[-2]
+        self.periodic_net_values = periodic_net_values
+
+        end_time = time.time()
+        print(f"Done in {end_time-start_time:.2f}s")
+
     def calc_factors(self):
         """计算因子"""
         calc_pool = CalcPool(
             df=self.bar_df,
             expressions=self.factor_expressions,
-            n_jobs=self.n_jobs,
+            n_jobs=1,
         )
         new_factor_df = calc_pool.calc_factors()
         factor_df = pd.concat([self._factor_df, new_factor_df],
@@ -214,6 +311,7 @@ class FactorBacktest:
     def calc_forward_returns(self):
         """计算前瞻收益"""
         print(">>> Calculating forward returns:", end=' ')
+        sys.stdout.flush()
 
         # 如果forward_periods中不包含1，则将1加入到forward_periods中
         if 1 not in self.forward_periods:
@@ -279,16 +377,32 @@ class FactorBacktest:
         """绘制因子相关性热力图"""
         start = time.time()
         print(">>> Plotting factor correlation:", end=' ')
+        sys.stdout.flush()
         factor_corr = self.factor_df.corr()
-        plt.figure(figsize=(12, 10), dpi=150)
-        sns.heatmap(factor_corr, annot=True, cmap='RdYlGn', linewidths=0.2)
+        plt.figure(figsize=(16, 13), dpi=150)
+        ax = sns.heatmap(factor_corr,
+                         annot=True,
+                         cmap='RdBu_r',
+                         linewidths=0.2,
+                         vmin=-1,
+                         vmax=1,
+                         cbar_kws={'use_gridspec': False})
+        ytick_labels = ax.get_yticklabels()
+        ax.set_yticklabels(ytick_labels, va='center')
         plt.title('Factor Correlation')
-        plt.savefig(os.path.join(self.output_dir, 'factor_corr.png'))
+        plt.savefig(
+            os.path.join(self.output_dir, self.universe, 'factor_corr.png'))
+        plt.savefig(
+            os.path.join(self.output_dir, self.universe, 'factor_corr.svg'))
         plt.close()
         end = time.time()
         print(f"Done in {end-start:.2f}s")
 
-    def optimize_combination(self):
+    def optimize_combination(
+        self,
+        compare_method: List[str] = ['excess', 'sharpe'],
+        auto_standardize: bool = True,
+    ) -> None:
         """优化因子组合（比较超额收益的夏普值）：先两两组合，选出最优组合，比较相对于最优的单个因子是否有边际提升，
         如果有提升，再尝试向组合中逐个添加新因子至三个因子，比较三个因子的组合相对于两个因子的组合是否有边际提升，
         依次类推，直到没有边际提升为止"""
@@ -300,202 +414,50 @@ class FactorBacktest:
         print(">>> Optimizing factor combination:")
 
         # 截面标准化，使得不同因子在截面上具有可加性
-        factor_addable = False
-        for postprocess in self.postprocess_queue.queue:
-            if postprocess.func in [
-                    Postprocess.standardize, Postprocess.normalize
-            ]:
-                factor_addable = True
-                break
-        if not factor_addable:
-            factor_df = Postprocess.standardize(self.factor_df)
+        if auto_standardize:
+            factor_addable = False
+            for postprocess in self.postprocess_queue.queue:
+                if postprocess.func in [
+                        Postprocess.standardize, Postprocess.normalize
+                ]:
+                    factor_addable = True
+                    break
+            if not factor_addable:
+                factor_list = []
+                for factor in self.factor_list:
+                    factor = copy.copy(factor)
+                    factor.factor_series = Postprocess.standardize(
+                        factor.factor_series)
+                    factor_list.append(factor)
+            else:
+                factor_list = self.factor_list
         else:
-            factor_df = self.factor_df.copy()
+            factor_list = self.factor_list
 
         # 得到单因子的超额收益表现
         old_sharpe_list = [
-            factor.quantile_return_performance.loc['excess', 'ann_sharpe']
+            factor.quantile_return_performance.loc[compare_method[0],
+                                                   compare_method[1]]
             for factor in self.factor_list
         ]
         old_best = np.argmax(old_sharpe_list)
         old_best_combination = self.factor_list[old_best]
         old_best_sharpe = old_sharpe_list[old_best]
         print(
-            f'(n=1) Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})'
+            f'(n=1) Best {compare_method[0]} {compare_method[1]}: {old_best_sharpe:.4f}, {old_best_combination.name}'
         )
 
-        # 两两组合
-        factor_combinations = list(combinations(factor_names, 2))
-
-        # 计算两两组合的因子
-        factor_list: List[Factor] = []
-        for factor1, factor2 in factor_combinations:
-            factor1 = factor_df[factor1]
-            factor2 = factor_df[factor2]
-            factor_combination = factor1 + factor2  # 因子组合
-            factor = Factor(
-                name=f'{factor1.name}_{factor2.name}',
-                factor_series=factor_combination,
-                forward_return_df=self.forward_return_df,
-                bench_forward_return_df=self.bench_return_df,
-                n_group=self.n_groups,
-                output_dir=self.output_dir,
-                position_adjust_datetimes=self.position_adjust_datetimes,
-            )
-            factor_list.append(factor)
-
-        # 分析优化因子（不需要分层回测和计算IC，只需要查看前quantile组的超额收益表现）
-        if self.n_jobs == 1:
-            for factor in tqdm(factor_list, desc='Combining 2 factors'):
-                factor.analyze_quantile()
-        else:
-            processes: List[Process] = []  # 进程列表，用于存储正在运行的进程
-            queue = Queue()  # 进程队列，用于存储已完成的进程
-
-            # 多进程时，使用共享变量来存储因子分析结果
-            manager = Manager()
-            shared_factor_list = manager.list()
-
-            tqdm_obj = tqdm(total=len(factor_list), desc='Combining 2 factors')
-
-            for factor in factor_list:
-                p = Process(target=_analyze_quantile_shared,
-                            args=(factor, shared_factor_list, queue))
-
-                # 当进程数达到最大值时，等待其中一个进程结束并移除
-                if len(processes) == self.n_jobs:
-                    completed_process_pid = queue.get()
-                    for process in processes:
-                        if process.pid == completed_process_pid:
-                            process.join()
-                            processes.remove(process)
-                            tqdm_obj.update()
-
-                # 在进程数未达到最大值时，直接加入新进程
-                processes.append(p)
-                p.start()
-
-            # 等待所有进程结束
-            for process in processes:
-                process.join()
-                tqdm_obj.update()
-
-            tqdm_obj.close()
-            factor_list = list(shared_factor_list)
-
-        # 两两组合的因子分析完毕，开始比较两两组合的因子的超额收益表现
-        sharpe_list = [
-            factor.quantile_return_performance.loc['excess', 'ann_sharpe']
-            for factor in factor_list
-        ]
-        done_combinations = dict(zip(factor_combinations, sharpe_list))
-        best_combination = max(done_combinations, key=done_combinations.get)
-        best_sharpe = done_combinations[best_combination]
-
-        # 比较两两组合的因子的超额收益表现与单因子的超额收益表现
-        if best_sharpe > max(old_sharpe_list):
-            print(f"(n=2) Best Sharpe: {best_sharpe:.4f} {best_combination}")
-            is_improved = True
-        else:
-            print(
-                f"(n=2) No improvement, Best Sharpe: {old_best_sharpe:.4f} ({old_best_combination.name})"
-            )
-            best_combination = old_best_combination.name
-            best_sharpe = old_best_sharpe
-            is_improved = False
-
-        if not is_improved:
-            return
-
-        factor_list: List[Factor] = []
-
-        # 从剩下的因子中，逐个添加到最优的两个因子中，生成三因子、四因子、...组合
-        rest_factor_names = list(set(factor_names) - set(best_combination))
-        for n in range(3, len(self.factor_list) + 1):
-            for factor_name in rest_factor_names:
-                combination = list(best_combination) + [factor_name]
-                factor_combination = sum(
-                    [factor_df[factor] for factor in combination])
-                factor = Factor(
-                    name='_'.join(combination),
-                    factor_series=factor_combination,
-                    forward_return_df=self.forward_return_df,
-                    bench_forward_return_df=self.bench_return_df,
-                    n_group=self.n_groups,
-                    output_dir=self.output_dir,
-                    position_adjust_datetimes=self.position_adjust_datetimes,
-                )
-                factor_list.append(factor)
-
-            # 对新组合的因子进行分析
-            if self.n_jobs == 1:
-                for factor in tqdm(factor_list, desc=f'Combining {n} factors'):
-                    factor.analyze_quantile()
-            else:
-                processes: List[Process] = []
-                queue = Queue()
-
-                manager = Manager()
-                shared_factor_list = manager.list()
-
-                tqdm_obj = tqdm(total=len(factor_list),
-                                desc=f'Combining {n} factors')
-
-                for factor in factor_list:
-                    p = Process(target=_analyze_quantile_shared,
-                                args=(factor, shared_factor_list, queue))
-
-                    if len(processes) == self.n_jobs:
-                        completed_process_pid = queue.get()
-                        for process in processes:
-                            if process.pid == completed_process_pid:
-                                process.join()
-                                processes.remove(process)
-                                tqdm_obj.update()
-
-                    processes.append(p)
-                    p.start()
-
-                for process in processes:
-                    process.join()
-                    tqdm_obj.update()
-
-                tqdm_obj.close()
-                factor_list = list(shared_factor_list)
-
-            # 比较新组合的因子的超额收益表现与当前最优组合的因子的超额收益表现
-            sharpe_list = [
-                factor.quantile_return_performance.loc['excess', 'ann_sharpe']
-                for factor in factor_list
-            ]
-            best_sharpe_idx = np.argmax(sharpe_list)
-
-            # 如果新组合的因子的超额收益表现优于当前最优组合的因子的超额收益表现，则更新最优组合
-            if sharpe_list[best_sharpe_idx] > best_sharpe:
-                best_sharpe = sharpe_list[best_sharpe_idx]
-                best_combination = tuple(best_combination) + (
-                    rest_factor_names.pop(best_sharpe_idx), )
-                print(
-                    f"(n={n}) Best Sharpe: {best_sharpe:.4f} {best_combination}"
-                )
-            # 如果新组合的因子的超额收益表现不优于当前最优组合的因子的超额收益表现，则停止添加新因子
-            else:
-                print(
-                    f"(n={n}) No improvement, Best Sharpe: {best_sharpe:.4f} ({best_combination})"
-                )
-                break
-
-        # 对最优组合的因子进行全面分析（包括因子IC、收益率、换手率等）
-        self.best_combination = list(best_combination)
-        self.best_sharpe = best_sharpe
-        factor = Factor(
-            name='_'.join(best_combination),
-            factor_series=sum(
-                [factor_df[factor] for factor in best_combination]),
+        factor_optimizer = FactorOptimizer(
+            factor_list=factor_list,
+            universe=self.universe,
+            analyze_fields=self.analyze_fields,
             forward_return_df=self.forward_return_df,
-            bench_forward_return_df=self.bench_return_df,
-            n_group=self.n_groups,
+            bench_return_df=self.bench_return_df,
+            group_periodic_net_values=self.group_periodic_net_values,
+            periodic_net_values=self.periodic_net_values,
+            n_groups=self.n_groups,
+            n_jobs=self.n_jobs,
             output_dir=self.output_dir,
-            position_adjust_datetimes=self.position_adjust_datetimes,
-        )
-        factor.analyze()
+            position_adjust_datetimes=self.position_adjust_datetimes)
+
+        factor_optimizer.optimize(row='excess', col='sharpe')

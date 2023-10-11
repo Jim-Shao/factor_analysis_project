@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+        href="file:////home/shaoshijie/.vscode-server/extensions/shd101wyy.markdown-preview-enhanced-0.6.8/node_modules/@shd101wyy/mume/dependencies/katex/katex.min.css">
+
+
+
+
+
+
+
+
+
+    <style>
+        /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            color: #333;
+            background: none;
+            font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            text-align: left;
+            white-space: pre;
+            word-spacing: normal;
+            word-break: normal;
+            word-wrap: normal;
+            line-height: 1.4;
+
+            -moz-tab-size: 8;
+            -o-tab-size: 8;
+            tab-size: 8;
+
+            -webkit-hyphens: none;
+            -moz-hyphens: none;
+            -ms-hyphens: none;
+            hyphens: none;
+        }
+
+        /* Code blocks */
+        pre[class*="language-"] {
+            padding: .8em;
+            overflow: auto;
+            /* border: 1px solid #ddd; */
+            border-radius: 3px;
+            /* background: #fff; */
+            background: #f5f5f5;
+        }
+
+        /* Inline code */
+        :not(pre)>code[class*="language-"] {
+            padding: .1em;
+            border-radius: .3em;
+            white-space: normal;
+            background: #f5f5f5;
+        }
+
+        .token.comment,
+        .token.blockquote {
+            color: #969896;
+        }
+
+        .token.cdata {
+            color: #183691;
+        }
+
+        .token.doctype,
+        .token.punctuation,
+        .token.variable,
+        .token.macro.property {
+            color: #333;
+        }
+
+        .token.operator,
+        .token.important,
+        .token.keyword,
+        .token.rule,
+        .token.builtin {
+            color: #a71d5d;
+        }
+
+        .token.string,
+        .token.url,
+        .token.regex,
+        .token.attr-value {
+            color: #183691;
+        }
+
+        .token.property,
+        .token.number,
+        .token.boolean,
+        .token.entity,
+        .token.atrule,
+        .token.constant,
+        .token.symbol,
+        .token.command,
+        .token.code {
+            color: #0086b3;
+        }
+
+        .token.tag,
+        .token.selector,
+        .token.prolog {
+            color: #63a35c;
+        }
+
+        .token.function,
+        .token.namespace,
+        .token.pseudo-element,
+        .token.class,
+        .token.class-name,
+        .token.pseudo-class,
+        .token.id,
+        .token.url-reference .token.variable,
+        .token.attr-name {
+            color: #795da3;
+        }
+
+        .token.entity {
+            cursor: help;
+        }
+
+        .token.title,
+        .token.title .token.punctuation {
+            font-weight: bold;
+            color: #1d3e81;
+        }
+
+        .token.list {
+            color: #ed6a43;
+        }
+
+        .token.inserted {
+            background-color: #eaffea;
+            color: #55a532;
+        }
+
+        .token.deleted {
+            background-color: #ffecec;
+            color: #bd2c00;
+        }
+
+        .token.bold {
+            font-weight: bold;
+        }
+
+        .token.italic {
+            font-style: italic;
+        }
+
+
+        /* JSON */
+        .language-json .token.property {
+            color: #183691;
+        }
+
+        .language-markup .token.tag .token.punctuation {
+            color: #333;
+        }
+
+        /* CSS */
+        code.language-css,
+        .language-css .token.function {
+            color: #0086b3;
+        }
+
+        /* YAML */
+        .language-yaml .token.atrule {
+            color: #63a35c;
+        }
+
+        code.language-yaml {
+            color: #183691;
+        }
+
+        /* Ruby */
+        .language-ruby .token.function {
+            color: #333;
+        }
+
+        /* Markdown */
+        .language-markdown .token.url {
+            color: #795da3;
+        }
+
+        /* Makefile */
+        .language-makefile .token.symbol {
+            color: #795da3;
+        }
+
+        .language-makefile .token.variable {
+            color: #183691;
+        }
+
+        .language-makefile .token.builtin {
+            color: #0086b3;
+        }
+
+        /* Bash */
+        .language-bash .token.keyword {
+            color: #0086b3;
+        }
+
+        /* highlight */
+        pre[data-line] {
+            position: relative;
+            padding: 1em 0 1em 3em;
+        }
+
+        pre[data-line] .line-highlight-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: transparent;
+            display: block;
+            width: 100%;
+        }
+
+        pre[data-line] .line-highlight {
+            position: absolute;
+            left: 0;
+            right: 0;
+            padding: inherit 0;
+            margin-top: 1em;
+            background: hsla(24, 20%, 50%, .08);
+            background: linear-gradient(to right, hsla(24, 20%, 50%, .1) 70%, hsla(24, 20%, 50%, 0));
+            pointer-events: none;
+            line-height: inherit;
+            white-space: pre;
+        }
+
+        pre[data-line] .line-highlight:before,
+        pre[data-line] .line-highlight[data-end]:after {
+            content: attr(data-start);
+            position: absolute;
+            top: .4em;
+            left: .6em;
+            min-width: 1em;
+            padding: 0 .5em;
+            background-color: hsla(24, 20%, 50%, .4);
+            color: hsl(24, 20%, 95%);
+            font: bold 65%/1.5 sans-serif;
+            text-align: center;
+            vertical-align: .3em;
+            border-radius: 999px;
+            text-shadow: none;
+            box-shadow: 0 1px white;
+        }
+
+        pre[data-line] .line-highlight[data-end]:after {
+            content: attr(data-end);
+            top: auto;
+            bottom: .4em;
+        }
+
+        html body {
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            overflow: initial;
+            box-sizing: border-box;
+            word-wrap: break-word
+        }
+
+        html body>:first-child {
+            margin-top: 0
+        }
+
+        html body h1,
+        html body h2,
+        html body h3,
+        html body h4,
+        html body h5,
+        html body h6 {
+            line-height: 1.2;
+            margin-top: 1em;
+            margin-bottom: 16px;
+            color: #000
+        }
+
+        html body h1 {
+            font-size: 2.25em;
+            font-weight: 300;
+            padding-bottom: .3em
+        }
+
+        html body h2 {
+            font-size: 1.75em;
+            font-weight: 400;
+            padding-bottom: .3em
+        }
+
+        html body h3 {
+            font-size: 1.5em;
+            font-weight: 500
+        }
+
+        html body h4 {
+            font-size: 1.25em;
+            font-weight: 600
+        }
+
+        html body h5 {
+            font-size: 1.1em;
+            font-weight: 600
+        }
+
+        html body h6 {
+            font-size: 1em;
+            font-weight: 600
+        }
+
+        html body h1,
+        html body h2,
+        html body h3,
+        html body h4,
+        html body h5 {
+            font-weight: 600
+        }
+
+        html body h5 {
+            font-size: 1em
+        }
+
+        html body h6 {
+            color: #5c5c5c
+        }
+
+        html body strong {
+            color: #000
+        }
+
+        html body del {
+            color: #5c5c5c
+        }
+
+        html body a:not([href]) {
+            color: inherit;
+            text-decoration: none
+        }
+
+        html body a {
+            color: #08c;
+            text-decoration: none
+        }
+
+        html body a:hover {
+            color: #00a3f5;
+            text-decoration: none
+        }
+
+        html body img {
+            max-width: 100%
+        }
+
+        html body>p {
+            margin-top: 0;
+            margin-bottom: 16px;
+            word-wrap: break-word
+        }
+
+        html body>ul,
+        html body>ol {
+            margin-bottom: 16px
+        }
+
+        html body ul,
+        html body ol {
+            padding-left: 2em
+        }
+
+        html body ul.no-list,
+        html body ol.no-list {
+            padding: 0;
+            list-style-type: none
+        }
+
+        html body ul ul,
+        html body ul ol,
+        html body ol ol,
+        html body ol ul {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        html body li {
+            margin-bottom: 0
+        }
+
+        html body li.task-list-item {
+            list-style: none
+        }
+
+        html body li>p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        html body .task-list-item-checkbox {
+            margin: 0 .2em .25em -1.8em;
+            vertical-align: middle
+        }
+
+        html body .task-list-item-checkbox:hover {
+            cursor: pointer
+        }
+
+        html body blockquote {
+            margin: 16px 0;
+            font-size: inherit;
+            padding: 0 15px;
+            color: #5c5c5c;
+            background-color: #f0f0f0;
+            border-left: 4px solid #d6d6d6
+        }
+
+        html body blockquote>:first-child {
+            margin-top: 0
+        }
+
+        html body blockquote>:last-child {
+            margin-bottom: 0
+        }
+
+        html body hr {
+            height: 4px;
+            margin: 32px 0;
+            background-color: #d6d6d6;
+            border: 0 none
+        }
+
+        html body table {
+            margin: 10px 0 15px 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+            display: block;
+            width: 100%;
+            overflow: auto;
+            word-break: normal;
+            word-break: keep-all
+        }
+
+        html body table th {
+            font-weight: bold;
+            color: #000
+        }
+
+        html body table td,
+        html body table th {
+            border: 1px solid #d6d6d6;
+            padding: 6px 13px
+        }
+
+        html body dl {
+            padding: 0
+        }
+
+        html body dl dt {
+            padding: 0;
+            margin-top: 16px;
+            font-size: 1em;
+            font-style: italic;
+            font-weight: bold
+        }
+
+        html body dl dd {
+            padding: 0 16px;
+            margin-bottom: 16px
+        }
+
+        html body code {
+            font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+            font-size: .85em !important;
+            color: #000;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            padding: .2em 0
+        }
+
+        html body code::before,
+        html body code::after {
+            letter-spacing: -0.2em;
+            content: "\00a0"
+        }
+
+        html body pre>code {
+            padding: 0;
+            margin: 0;
+            font-size: .85em !important;
+            word-break: normal;
+            white-space: pre;
+            background: transparent;
+            border: 0
+        }
+
+        html body .highlight {
+            margin-bottom: 16px
+        }
+
+        html body .highlight pre,
+        html body pre {
+            padding: 1em;
+            overflow: auto;
+            font-size: .85em !important;
+            line-height: 1.45;
+            border: #d6d6d6;
+            border-radius: 3px
+        }
+
+        html body .highlight pre {
+            margin-bottom: 0;
+            word-break: normal
+        }
+
+        html body pre code,
+        html body pre tt {
+            display: inline;
+            max-width: initial;
+            padding: 0;
+            margin: 0;
+            overflow: initial;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0
+        }
+
+        html body pre code:before,
+        html body pre tt:before,
+        html body pre code:after,
+        html body pre tt:after {
+            content: normal
+        }
+
+        html body p,
+        html body blockquote,
+        html body ul,
+        html body ol,
+        html body dl,
+        html body pre {
+            margin-top: 0;
+            margin-bottom: 16px
+        }
+
+        html body kbd {
+            color: #000;
+            border: 1px solid #d6d6d6;
+            border-bottom: 2px solid #c7c7c7;
+            padding: 2px 4px;
+            background-color: #f0f0f0;
+            border-radius: 3px
+        }
+
+        @media print {
+            html body {
+                background-color: #fff
+            }
+
+            html body h1,
+            html body h2,
+            html body h3,
+            html body h4,
+            html body h5,
+            html body h6 {
+                color: #000;
+                page-break-after: avoid
+            }
+
+            html body blockquote {
+                color: #5c5c5c
+            }
+
+            html body pre {
+                page-break-inside: avoid
+            }
+
+            html body table {
+                display: table
+            }
+
+            html body img {
+                display: block;
+                max-width: 100%;
+                max-height: 100%
+            }
+
+            html body pre,
+            html body code {
+                word-wrap: break-word;
+                white-space: pre
+            }
+        }
+
+        .markdown-preview {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box
+        }
+
+        .markdown-preview .pagebreak,
+        .markdown-preview .newpage {
+            page-break-before: always
+        }
+
+        .markdown-preview pre.line-numbers {
+            position: relative;
+            padding-left: 3.8em;
+            counter-reset: linenumber
+        }
+
+        .markdown-preview pre.line-numbers>code {
+            position: relative
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows {
+            position: absolute;
+            pointer-events: none;
+            top: 1em;
+            font-size: 100%;
+            left: 0;
+            width: 3em;
+            letter-spacing: -1px;
+            border-right: 1px solid #999;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows>span {
+            pointer-events: none;
+            display: block;
+            counter-increment: linenumber
+        }
+
+        .markdown-preview pre.line-numbers .line-numbers-rows>span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: .8em;
+            text-align: right
+        }
+
+        .markdown-preview .mathjax-exps .MathJax_Display {
+            text-align: center !important
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .btn-group {
+            display: none
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .status {
+            display: none
+        }
+
+        .markdown-preview:not([for="preview"]) .code-chunk .output-div {
+            margin-bottom: 16px
+        }
+
+        .markdown-preview .md-toc {
+            padding: 0
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link {
+            display: inline;
+            padding: .25rem 0
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p,
+        .markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div {
+            display: inline
+        }
+
+        .markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link {
+            font-weight: 800
+        }
+
+        .scrollbar-style::-webkit-scrollbar {
+            width: 8px
+        }
+
+        .scrollbar-style::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: transparent
+        }
+
+        .scrollbar-style::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: rgba(150, 150, 150, 0.66);
+            border: 4px solid rgba(150, 150, 150, 0.66);
+            background-clip: content-box
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            margin: 0;
+            padding: 0;
+            overflow: auto
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+            position: relative;
+            top: 0
+        }
+
+        @media screen and (min-width:914px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                padding: 2em calc(50% - 457px + 2em)
+            }
+        }
+
+        @media screen and (max-width:914px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                padding: 2em
+            }
+        }
+
+        @media screen and (max-width:450px) {
+            html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+                font-size: 14px !important;
+                padding: 1em
+            }
+        }
+
+        @media print {
+            html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+                display: none
+            }
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            font-size: 28px;
+            cursor: pointer;
+            color: inherit;
+            z-index: 99;
+            width: 32px;
+            text-align: center;
+            opacity: .4
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn {
+            opacity: 1
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            padding: 32px 0 48px 0;
+            font-size: 14px;
+            box-shadow: 0 0 4px rgba(150, 150, 150, 0.33);
+            box-sizing: border-box;
+            overflow: auto;
+            background-color: inherit
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar {
+            width: 8px
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: transparent
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: rgba(150, 150, 150, 0.66);
+            border: 4px solid rgba(150, 150, 150, 0.66);
+            background-clip: content-box
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a {
+            text-decoration: none
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc {
+            padding: 0 16px
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link {
+            display: inline;
+            padding: .25rem 0
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p,
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div {
+            display: inline
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link {
+            font-weight: 800
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+            left: 300px;
+            width: calc(100% - 300px);
+            padding: 2em calc(50% - 457px - 300px/2);
+            margin: 0;
+            box-sizing: border-box
+        }
+
+        @media screen and (max-width:1274px) {
+            html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+                padding: 2em
+            }
+        }
+
+        @media screen and (max-width:450px) {
+            html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+                width: 100%
+            }
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview {
+            left: 50%;
+            transform: translateX(-50%)
+        }
+
+        html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc {
+            display: none
+        }
+
+        /* Please visit the URL below for more information: */
+        /*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+    </style>
+</head>
+
+<body>
+    <h1 id="_1">因子分析报告</h1>
+<h2 id="randomgenerated13">RandomGenerated1，3个因子</h2>
+<h3 id="rankict20ir">RankIC比较，根据(T=20,IR)降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">T=1</th>
+      <th colspan="3" halign="left">T=5</th>
+      <th colspan="3" halign="left">T=10</th>
+      <th colspan="3" halign="left">T=20</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0439</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3083</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1425</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0941</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3166</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2971</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1529</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2948</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5187</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.196</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2869</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6829</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0463</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3385</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.1367</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0413</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3081</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1341</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0882</td>
+      <td style="text-align:right; background-color:rgba(250, 202, 177, 76)">0.323</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.2732</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1222</td>
+      <td style="text-align:right; background-color:rgba(251, 227, 214, 76)">0.3088</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.3957</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0463</td>
+      <td style="text-align:right; background-color:rgba(216, 232, 241, 76)">0.3153</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1467</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.0375</td>
+      <td style="text-align:right; background-color:rgba(222, 235, 242, 76)">0.3106</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.1206</td>
+      <td style="text-align:right; background-color:rgba(179, 213, 231, 76)">-0.0846</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.325</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.2603</td>
+      <td style="text-align:right; background-color:rgba(179, 213, 231, 76)">-0.1184</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3169</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.3736</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="t20sharpe">因子(T=20)收益比较，根据sharpe降序</h3>
+<h4 id="_2">多空组合</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.355</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3223</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.391</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">4.2044</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5363</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9138</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">14</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6072</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(222, 235, 242, 76)">-0.0227</td>
+      <td style="text-align:right; background-color:rgba(252, 221, 202, 76)">0.555</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">0.3839</td>
+      <td style="text-align:right; background-color:rgba(210, 229, 240, 76)">-0.041</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.8202</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">18</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6389</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.5908</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6092</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.6449</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.9698</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(210, 229, 240, 76)">0.837</td>
+      <td style="text-align:right; background-color:rgba(251, 225, 210, 76)">17</td>
+      <td style="text-align:right; background-color:rgba(226, 237, 243, 76)">0.6177</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated1多空组合对数收益率" src="RandomGenerated1_long_short.svg"></p>
+<h4 id="_3">多头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">4.3663</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3874</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.0807</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">11.2703</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5393</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">1.0993</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">0.3655</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5103</td>
+      <td style="text-align:right; background-color:rgba(184, 216, 232, 76)">0.8451</td>
+      <td style="text-align:right; background-color:rgba(179, 213, 231, 76)">0.7162</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5337</td>
+      <td style="text-align:right; background-color:rgba(251, 225, 210, 76)">1.1528</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6111</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2747</td>
+      <td style="text-align:right; background-color:rgba(252, 221, 202, 76)">0.4861</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.7916</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5651</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5393</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1706</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">0.5556</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated1多头超额对数收益率" src="RandomGenerated1_long_excess.svg"></p>
+<h4 id="_4">空头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.7274</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.8111</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.5824</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.8968</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4888</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">1.1292</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6667</td>
+    </tr>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(228, 238, 243, 76)">-0.828</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">0.8132</td>
+      <td style="text-align:right; background-color:rgba(249, 233, 223, 76)">-0.8295</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-1.0181</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4888</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.2166</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6667</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8794</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8905</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-1.3048</td>
+      <td style="text-align:right; background-color:rgba(217, 233, 241, 76)">-0.9875</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4663</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">1.1261</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6875</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated1空头超额对数收益率" src="RandomGenerated1_short_excess.svg"></p>
+<h3 id="sharpe">单因子策略收益比较，根据sharpe降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">excess_return</th>
+      <th colspan="3" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">6.1591</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4303</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.336</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">14.3145</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5475</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">1.1043</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3802</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.1931</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1941</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6026</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3654</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.322</td>
+      <td style="text-align:right; background-color:rgba(226, 237, 243, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(238, 243, 245, 76)">1.1249</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6574</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3869</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.2186</td>
+      <td style="text-align:right; background-color:rgba(251, 210, 188, 76)">0.5811</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3581</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.3763</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4804</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1526</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(251, 227, 214, 76)">0.582</td>
+      <td style="text-align:right; background-color:rgba(252, 220, 200, 76)">0.3513</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated1单因子策略对数收益率" src="RandomGenerated1_quantile_log_return.svg"></p>
+<div style="page-break-after: always;"></div>
+<h3 id="_5">因子相关性热力图</h3>
+<p><img alt="RandomGenerated1因子相关性" src="RandomGenerated1/factor_corr.svg"></p>
+<h3 id="_6">因子等权组合优化</h3>
+<h4 id="_7">没有找到优化因子</h4>
+<div style="page-break-after: always;"></div>
+<h2 id="randomgenerated23">RandomGenerated2，3个因子</h2>
+<h3 id="rankict20ir_1">RankIC比较，根据(T=20,IR)降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">T=1</th>
+      <th colspan="3" halign="left">T=5</th>
+      <th colspan="3" halign="left">T=10</th>
+      <th colspan="3" halign="left">T=20</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0081</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3405</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0239</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0577</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3199</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1804</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.063</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3131</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2013</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0926</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.362</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2558</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0297</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3586</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0827</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.034</td>
+      <td style="text-align:right; background-color:rgba(248, 239, 234, 76)">0.3225</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.1055</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.0242</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3414</td>
+      <td style="text-align:right; background-color:rgba(186, 217, 233, 76)">0.0709</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.006</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3462</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.0173</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(249, 235, 227, 76)">0.022</td>
+      <td style="text-align:right; background-color:rgba(251, 226, 212, 76)">0.3539</td>
+      <td style="text-align:right; background-color:rgba(249, 234, 225, 76)">0.0622</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">0.0344</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3243</td>
+      <td style="text-align:right; background-color:rgba(179, 213, 231, 76)">0.1061</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0211</td>
+      <td style="text-align:right; background-color:rgba(249, 233, 223, 76)">0.3317</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0635</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0006</td>
+      <td style="text-align:right; background-color:rgba(201, 225, 237, 76)">0.3483</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0017</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="t20sharpe_1">因子(T=20)收益比较，根据sharpe降序</h3>
+<h4 id="_8">多空组合</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">3.711</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3852</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.2569</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9.6329</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">0.5251</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.845</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">15</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7667</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(249, 233, 223, 76)">2.4903</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3852</td>
+      <td style="text-align:right; background-color:rgba(252, 222, 204, 76)">1.9083</td>
+      <td style="text-align:right; background-color:rgba(249, 233, 223, 76)">6.4643</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5363</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.8403</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">15</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7667</td>
+    </tr>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0987</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4921</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.565</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2006</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.514</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9248</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">11</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6364</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated2多空组合对数收益率" src="RandomGenerated2_long_short.svg"></p>
+<h4 id="_9">多头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4577</td>
+      <td style="text-align:right; background-color:rgba(209, 229, 240, 76)">0.3257</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9541</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.4053</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">0.5169</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5573</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">7</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7857</td>
+    </tr>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">0.3918</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4193</td>
+      <td style="text-align:right; background-color:rgba(240, 243, 245, 76)">0.8572</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.9344</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5337</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.582</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">6</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6667</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3255</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3062</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.7824</td>
+      <td style="text-align:right; background-color:rgba(220, 234, 242, 76)">1.0631</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.559</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">7</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7857</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated2多头超额对数收益率" src="RandomGenerated2_long_excess.svg"></p>
+<h4 id="_10">空头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.8014</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2068</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.7772</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">13.5446</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5674</td>
+      <td style="text-align:right; background-color:rgba(199, 223, 237, 76)">0.5331</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.75</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(248, 239, 234, 76)">1.5641</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2068</td>
+      <td style="text-align:right; background-color:rgba(251, 226, 212, 76)">2.0582</td>
+      <td style="text-align:right; background-color:rgba(248, 239, 234, 76)">7.5624</td>
+      <td style="text-align:right; background-color:rgba(226, 237, 243, 76)">0.5225</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5252</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.75</td>
+    </tr>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1414</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.254</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0443</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.5567</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.599</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated2空头超额对数收益率" src="RandomGenerated2_short_excess.svg"></p>
+<h3 id="sharpe_1">单因子策略收益比较，根据sharpe降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">excess_return</th>
+      <th colspan="3" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>open</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.669</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3969</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1758</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.6856</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5587</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5763</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3555</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2584</td>
+    </tr>
+    <tr>
+      <th>factor1</th>
+      <td style="text-align:right; background-color:rgba(179, 213, 231, 76)">-0.455</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5737</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.7093</td>
+      <td style="text-align:right; background-color:rgba(181, 215, 232, 76)">-0.7931</td>
+      <td style="text-align:right; background-color:rgba(189, 218, 234, 76)">0.4749</td>
+      <td style="text-align:right; background-color:rgba(250, 202, 177, 76)">0.6011</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 193, 166, 76)">0.9042</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2334</td>
+    </tr>
+    <tr>
+      <th>factor2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.4671</td>
+      <td style="text-align:right; background-color:rgba(251, 212, 190, 76)">0.5502</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.7427</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8491</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4693</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6026</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9078</td>
+      <td style="text-align:right; background-color:rgba(194, 221, 235, 76)">0.2356</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="RandomGenerated2单因子策略对数收益率" src="RandomGenerated2_quantile_log_return.svg"></p>
+<div style="page-break-after: always;"></div>
+<h3 id="_11">因子相关性热力图</h3>
+<p><img alt="RandomGenerated2因子相关性" src="RandomGenerated2/factor_corr.svg"></p>
+<h3 id="_12">因子等权组合优化</h3>
+<h4 id="_13">没有找到优化因子</h4>
+<div style="page-break-after: always;"></div>
+<h2 id="factor12">factor1，2个选股池</h2>
+<h3 id="rankict20ir_2">RankIC比较，根据(T=20,IR)降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">T=1</th>
+      <th colspan="3" halign="left">T=5</th>
+      <th colspan="3" halign="left">T=10</th>
+      <th colspan="3" halign="left">T=20</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0297</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3586</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0827</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.034</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3225</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1055</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0242</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3414</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0709</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.006</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3462</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0173</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0463</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3153</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1467</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0375</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3106</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1206</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0846</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.325</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.2603</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1184</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3169</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.3736</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="t20sharpe_2">因子(T=20)收益比较，根据sharpe降序</h3>
+<h4 id="_14">多空组合</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.4903</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3852</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.9083</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">6.4643</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5363</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8403</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">15</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7667</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.5908</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6092</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.6449</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.9698</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.837</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">17</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6177</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor1多空组合对数收益率" src="factor1_long_short.svg"></p>
+<h4 id="_15">多头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4577</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3257</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9541</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.4053</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5169</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5573</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">7</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7857</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2747</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4861</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.7916</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5651</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5393</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1706</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5556</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor1多头超额对数收益率" src="factor1_long_excess.svg"></p>
+<h4 id="_16">空头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.5641</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2068</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.0582</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">7.5624</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5225</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5252</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.75</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8794</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8905</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-1.3048</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.9875</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4663</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1261</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6875</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor1空头超额对数收益率" src="factor1_short_excess.svg"></p>
+<h3 id="sharpe_2">单因子策略收益比较，根据sharpe降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">excess_return</th>
+      <th colspan="3" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.2186</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5811</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3581</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.3763</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4804</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1526</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.582</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3513</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.455</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5737</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.7093</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.7931</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4749</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6011</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9042</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2334</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor1单因子策略对数收益率" src="factor1_quantile_log_return.svg"></p>
+<div style="page-break-after: always;"></div>
+<h2 id="factor22">factor2，2个选股池</h2>
+<h3 id="rankict20ir_3">RankIC比较，根据(T=20,IR)降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">T=1</th>
+      <th colspan="3" halign="left">T=5</th>
+      <th colspan="3" halign="left">T=10</th>
+      <th colspan="3" halign="left">T=20</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.022</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3539</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0622</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0344</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3243</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1061</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0211</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3317</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0635</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.0006</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3483</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.0017</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0463</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3385</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1367</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0413</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3081</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1341</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0882</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.323</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.2732</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.1222</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3088</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.3957</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="t20sharpe_3">因子(T=20)收益比较，根据sharpe降序</h3>
+<h4 id="_17">多空组合</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">3.711</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3852</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.2569</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9.6329</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5251</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.845</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">15</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7667</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.0227</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.555</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3839</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.041</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.8202</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">18</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6389</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor2多空组合对数收益率" src="factor2_long_short.svg"></p>
+<h4 id="_18">多头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3655</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5103</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8451</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.7162</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5337</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1528</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6111</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3255</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3062</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.7824</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.0631</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.559</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">7</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.7857</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor2多头超额对数收益率" src="factor2_long_excess.svg"></p>
+<h4 id="_19">空头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.8014</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2068</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.7772</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">13.5446</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5674</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5331</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">8</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.75</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.7274</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8111</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.5824</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8968</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4888</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1292</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6667</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor2空头超额对数收益率" src="factor2_short_excess.svg"></p>
+<h3 id="sharpe_3">单因子策略收益比较，根据sharpe降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">excess_return</th>
+      <th colspan="3" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.1941</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6026</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3654</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.322</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5028</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1249</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6574</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3869</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.4671</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5502</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.7427</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8491</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4693</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6026</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9078</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2356</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="factor2单因子策略对数收益率" src="factor2_quantile_log_return.svg"></p>
+<div style="page-break-after: always;"></div>
+<h2 id="open2">open，2个选股池</h2>
+<h3 id="rankict20ir_4">RankIC比较，根据(T=20,IR)降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">T=1</th>
+      <th colspan="3" halign="left">T=5</th>
+      <th colspan="3" halign="left">T=10</th>
+      <th colspan="3" halign="left">T=20</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>IR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0439</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3083</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1425</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0941</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3166</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2971</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.1529</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2948</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5187</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.196</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2869</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6829</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0081</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3405</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0239</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0577</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3199</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.1804</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.063</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3131</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2013</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0926</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.362</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2558</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="t20sharpe_4">因子(T=20)收益比较，根据sharpe降序</h3>
+<h4 id="_20">多空组合</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.355</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3223</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.391</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">4.2044</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5363</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.9138</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">14</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6072</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.0987</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4921</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.565</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.2006</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.514</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.9248</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">11</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6364</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="open多空组合对数收益率" src="open_long_short.svg"></p>
+<h4 id="_21">多头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">4.3663</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3874</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.0807</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">11.2703</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5393</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.0993</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3918</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4193</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.8572</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.9344</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5337</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.582</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">6</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6667</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="open多头超额对数收益率" src="open_long_excess.svg"></p>
+<h4 id="_22">空头超额</h4>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">return</th>
+      <th colspan="2" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.1414</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.254</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.0443</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">-0.5567</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.599</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">5</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.6</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.828</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.8132</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-0.8295</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">-1.0181</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.4888</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.2166</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.6667</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="open空头超额对数收益率" src="open_short_excess.svg"></p>
+<h3 id="sharpe_4">单因子策略收益比较，根据sharpe降序</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="6" halign="left">excess_return</th>
+      <th colspan="3" halign="left">turnover</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>ann_ret</th>
+      <th>max_dd</th>
+      <th>sharpe</th>
+      <th>calmar</th>
+      <th>win_rate</th>
+      <th>ann_vol</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RandomGenerated1</th>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">6.1591</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.4303</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">2.336</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">14.3145</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5475</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">1.1043</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.3802</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.1931</td>
+    </tr>
+    <tr>
+      <th>RandomGenerated2</th>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.669</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3969</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">1.1758</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">1.6856</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.5587</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.5763</td>
+      <td style="text-align:right; background-color:rgba(247, 246, 246, 76)">9</td>
+      <td style="text-align:right; background-color:rgba(176, 212, 230, 76)">0.3555</td>
+      <td style="text-align:right; background-color:rgba(248, 191, 163, 76)">0.2584</td>
+    </tr>
+  </tbody>
+</table>
+<p><img alt="open单因子策略对数收益率" src="open_quantile_log_return.svg"></p>
+<div style="page-break-after: always;"></div>
+</body>
+
+</html>

@@ -9,11 +9,15 @@
 import os
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 from datetime import datetime
-from typing import Union, Tuple
+from typing import Union, Tuple, List
+
+# plt.rc('font', family='Noto Sans CJK JP')  # 设置中文字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示为方块的问题
 
 
 def _non_nan_mean(x: pd.Series) -> float:
@@ -63,7 +67,7 @@ def plot_net_value(
     forward_period: int,
     fig_dir: str,
     fig_name: str,
-    fig_size: Tuple[int, int] = (16, 4.4),
+    fig_size: Tuple[int, int] = (16, 5.2),
     dpi: int = 150,
     xtick_freq: str = 'year',
 ):
@@ -101,9 +105,7 @@ def plot_net_value(
     else:
         # 绘制每一列的净值曲线
         for group in returns.columns:
-            # 除以forward_period是为了滚仓，比如预测未来5天的收益率，
-            # 那么将资金划分成5份，每天的收益率都是当天收益率1/5
-            net_value = (returns[group] / forward_period + 1).cumprod()
+            net_value = (returns[group] + 1).cumprod()
             # 后移forward_period来将某天的forward_return变成当天的实际return
             net_value = net_value.shift(forward_period)
             ax.plot(datetimes, net_value, label=group)
@@ -122,6 +124,90 @@ def plot_net_value(
     title = f'Net Value: ({start_date} ~ {end_date})'
     save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.legend(loc="upper left")
+    plt.ylabel('net value')
+    plt.grid()
+    plt.title(title)
+    plt.tight_layout()  # 防止x轴刻度被裁剪
+    plt.savefig(save_path)
+    plt.close()
+
+
+def plot_log_return(
+    log_return: pd.DataFrame,
+    fig_dir: str,
+    fig_name: str,
+    fig_size: Tuple[int, int] = (16, 5),
+    dpi: int = 150,
+    xtick_freq: str = 'year',
+    colors: List[str] = None,
+):
+    """
+    绘制累计对数收益率曲线
+
+    Parameters
+    ----------
+    log_return : pd.DataFrame
+        对数收益率序列，若为pd.DataFrame，则每一列为一条曲线
+    fig_dir : str
+        图片保存文件夹路径，e.g. 'factor_analysis/report/figs'
+    fig_name : str
+        图片名称，e.g. 'log_return'
+    fig_size : Tuple[int, int], optional
+        图片大小, by default (10, 4.4)
+    dpi : int, optional
+        图片dpi, by default 150
+    xtick_freq : str, optional
+        x轴刻度频率，可选值为'year', 'month', 'day', by default 'year'
+    colors: List[str], optional
+        每一列的颜色，by default None
+    """
+    # 检查returns的index是否为datetime index
+    assert log_return.index.name == 'datetime', 'index of returns must be datetime'
+    assert isinstance(log_return.index,
+                      pd.DatetimeIndex), 'index of returns must be datetime'
+    if colors is not None:
+        assert log_return.shape[1] == len(
+            colors
+        ), 'colors must have the same length as the number of columns of log_return'
+
+    datetimes = log_return.index.to_list()
+
+    fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+    # 如果是series则直接绘制净值曲线
+    if isinstance(log_return, pd.Series):
+        if colors is None:
+            ax.plot(datetimes, log_return, label=log_return.name)
+        else:
+            ax.plot(datetimes,
+                    log_return,
+                    label=log_return.name,
+                    color=colors[0])
+    else:
+        # 绘制每一列的净值曲线
+        for i, group in enumerate(log_return.columns):
+            if colors is None:
+                ax.plot(datetimes, log_return[group], label=group)
+            else:
+                ax.plot(datetimes,
+                        log_return[group],
+                        label=group,
+                        color=colors[i])
+
+    # 设置x轴刻度
+    if xtick_freq in ['year', 'month']:
+        _set_xticks(ax, xtick_freq)
+    else:
+        raise ValueError(
+            f'xtick_freq must be one of ["year", "month"], but got {xtick_freq}'
+        )
+
+    # 设置标题、保存路径、图例、网格
+    start_date = datetimes[0].strftime('%Y-%m-%d')
+    end_date = datetimes[-1].strftime('%Y-%m-%d')
+    title = f'Cumulative Log Return: ({start_date} ~ {end_date})'
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
+    plt.legend(loc="upper left")
+    plt.ylabel('log return cumsum')
     plt.grid()
     plt.title(title)
     plt.tight_layout()  # 防止x轴刻度被裁剪
@@ -130,11 +216,13 @@ def plot_net_value(
 
 
 def plot_ic_series(
-        IC_series: pd.Series,
-        fig_dir: str,
-        fig_name: str,
-        fig_size: Tuple[int, int] = (16, 6),
-        dpi: int = 150,
+    IC_series: pd.Series,
+    IC_type: pd.Series,
+    fig_dir: str,
+    fig_name: str,
+    fig_size: Tuple[int, int] = (16, 6.5),
+    dpi: int = 150,
+    xtick_freq: str = 'year',
 ):
     """
     绘制IC序列
@@ -143,6 +231,8 @@ def plot_ic_series(
     ----------
     IC_series : pd.Series
         IC序列
+    IC_type : pd.Series
+        IC类型，e.g. 'IC', 'RankIC'
     fig_dir : str
         图片保存文件夹路径，e.g. 'factor_analysis/report/figs'
     fig_name : str
@@ -151,11 +241,15 @@ def plot_ic_series(
         图片大小, by default (10, 5)
     dpi : int, optional
         图片dpi, by default 150
+    xtick_freq : str, optional
+        x轴刻度频率，可选值为'year', 'month', 'day', by default 'year'
     """
     # 检查IC_series的index是否为datetime index
     assert IC_series.index.name == 'datetime', 'index of IC_series must be datetime'
     assert isinstance(IC_series.index,
                       pd.DatetimeIndex), 'index of IC_series must be datetime'
+    assert IC_type in ['IC',
+                       'RankIC'], 'IC_type must be one of ["IC", "RankIC"]'
 
     datetimes = IC_series.index.to_list()
 
@@ -166,18 +260,19 @@ def plot_ic_series(
     fig, ax1 = plt.subplots(figsize=fig_size, dpi=dpi)
     ax1.bar(weekly_IC_series.index,
             weekly_IC_series,
-            label='weekly IC mean',
+            label=f'weekly {IC_type} mean',
             width=-5,
             align='edge')
-    ax1.set_ylabel('IC')
-    ax1.set_xlabel('datetime')
+    ax1.set_ylabel(IC_type)
+    if xtick_freq in ['year', 'month']:
+        _set_xticks(ax1, xtick_freq)
 
     # 画IC平均值
     ax1.axhline(y=IC_series.mean(),
                 color='purple',
                 linestyle='--',
                 linewidth=2,
-                label='IC mean')
+                label=f'{IC_type} mean')
     handles, labels = plt.gca().get_legend_handles_labels()
 
     # 调整legend顺序并显示legend
@@ -185,19 +280,20 @@ def plot_ic_series(
     ax1.legend([handles[idx] for idx in order], [labels[idx] for idx in order],
                loc="upper left")
 
-    # 在y=0处画一条水平线
-    ax1.axhline(y=0, color='black', linestyle='-', linewidth=1)
+    # # 在y=0处画一条水平线
+    # ax1.axhline(y=0, color='black', linestyle='-', linewidth=1)
+    plt.grid()  # 显示网格
 
     # 画IC累计值
     ax2 = ax1.twinx()
     ax2.plot(datetimes,
              IC_series.cumsum(),
-             label='daily IC cumsum',
+             label=f'daily {IC_type} cumsum',
              color='red')
     ax2.set_ylabel('IC cumsum')
+    if xtick_freq in ['year', 'month']:
+        _set_xticks(ax2, xtick_freq)
     ax2.legend(loc="upper right")
-
-    plt.grid()  # 显示网格
 
     # 计算IC的均值、标准差、IR、胜率并以图例的形式显示
     ax3 = ax1.twinx()
@@ -208,13 +304,13 @@ def plot_ic_series(
 
     if IC_mean > 0:
         IC_win_rate = (IC_series > 0).sum() / len(IC_series)
-        IC_win_rate_label = f'IC (+)rate: {IC_win_rate:.4f}'
+        IC_win_rate_label = f'{IC_type} (+)rate: {IC_win_rate:.4f}'
     elif IC_mean < 0:
         IC_win_rate = (IC_series < 0).sum() / len(IC_series)
-        IC_win_rate_label = f'IC (-)rate:  {IC_win_rate:.4f}'
+        IC_win_rate_label = f'{IC_type} (-)rate:  {IC_win_rate:.4f}'
     else:
         IC_win_rate = (IC_series == 0).sum() / len(IC_series)
-        IC_win_rate_label = f'IC (0)rate: {IC_win_rate:.4f}'
+        IC_win_rate_label = f'{IC_type} (0)rate: {IC_win_rate:.4f}'
 
     IC_mean = f' {IC_mean:.4f}' if IC_mean >= 0 else f'{IC_mean:.4f}'
     IC_std = f' {IC_std:.4f}' if IC_std >= 0 else f'{IC_std:.4f}'
@@ -223,15 +319,15 @@ def plot_ic_series(
     IC_mean_legend = plt.Line2D([], [],
                                 color='black',
                                 linestyle='',
-                                label=f'IC mean:  {IC_mean}        ')
+                                label=f'{IC_type} mean:  {IC_mean}        ')
     IC_std_legend = plt.Line2D([], [],
                                color='black',
                                linestyle='',
-                               label=f'IC std:      {IC_std}        ')
+                               label=f'{IC_type} std:      {IC_std}        ')
     ICIR_legend = plt.Line2D([], [],
                              color='black',
                              linestyle='',
-                             label=f'IC IR:        {IC_IR}        ')
+                             label=f'{IC_type} IR:        {IC_IR}        ')
     IC_win_rate_legend = plt.Line2D(
         [],
         [],
@@ -249,10 +345,70 @@ def plot_ic_series(
     # 设置标题、保存图片
     start_date = datetimes[0].strftime('%Y-%m-%d')
     end_date = datetimes[-1].strftime('%Y-%m-%d')
-    title = f'IC: ({start_date} ~ {end_date})'
+    title = f'{IC_type}: ({start_date} ~ {end_date})'
     save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.title(title)
     plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close()
+
+
+def plot_ann_return(
+    ann_return: pd.DataFrame,
+    fig_dir: str,
+    fig_name: str,
+    fig_size: Tuple[int, int] = (16, 3),
+    dpi: int = 150,
+    colors: List[str] = None,
+):
+    """
+    画年化收益率柱状图
+
+    Parameters
+    ----------
+    ann_return : pd.DataFrame
+        计算好的的年化收益率，index为datetime
+    fig_dir : str
+        图片保存文件夹路径，e.g. 'factor_analysis/report/figs'
+    fig_name : str
+        图片名称，e.g. 'ann_return'
+    fig_size : Tuple[int, int], optional
+        图片大小，by default (10, 5)
+    dpi : int, optional
+        图片分辨率，by default 150
+    colors: List[str], optional
+        每一列的颜色，by default None
+    """
+    if colors is not None:
+        assert ann_return.shape[1] == len(
+            colors
+        ), 'colors must have the same length as the number of columns of ann_return'
+
+    bar_width = 0.6 / ann_return.shape[1]
+
+    years = ann_return.index.tolist()
+
+    plt.figure(figsize=fig_size, dpi=dpi)
+    for i, (col, ann_return_series) in enumerate(ann_return.iteritems()):
+        x = np.arange(
+            len(years)) + (i - ann_return.shape[1] / 2 + 0.5) * bar_width
+        if colors is None:
+            plt.bar(x, ann_return_series, width=bar_width, label=col)
+        else:
+            plt.bar(x,
+                    ann_return_series,
+                    width=bar_width,
+                    label=col,
+                    color=colors[i])
+
+    plt.ylabel('annualized return')
+    plt.xticks(np.arange(len(years)), years)
+    plt.legend(loc='upper left')
+    plt.grid()
+
+    plt.title(f'Annualized Return: ({years[0]} ~ {years[-1]})')
+    plt.tight_layout()
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.savefig(save_path)
     plt.close()
 
@@ -261,7 +417,7 @@ def plot_turnover(
     turnover_df: pd.DataFrame,
     fig_dir: str,
     fig_name: str,
-    fig_size: Tuple[int, int] = (16, 3),
+    fig_size: Tuple[int, int] = (16, 2.8),
     dpi: int = 150,
     xtick_freq: str = 'year',
     MA_window: int = 20,
@@ -300,7 +456,7 @@ def plot_turnover(
     subplots = []
     for i in range(n_groups):
 
-        ax = plt.subplot(n_groups, 1, i + 1)
+        ax = plt.subplot(n_groups, 1, i + 1, label=f'subplot{i+1}')
         # 绘制日换手率柱状图
         ax.bar(datetimes,
                turnover_df.iloc[:, i],
@@ -385,6 +541,80 @@ def plot_turnover(
     # 保存图
     save_path = os.path.join(fig_dir, f'{fig_name}.svg')
     plt.savefig(save_path, dpi=dpi)
+    plt.close()
+
+
+def plot_line(series: pd.Series,
+              title: str,
+              fig_dir: str,
+              fig_name: str,
+              fig_size: Tuple[int, int] = (16, 6),
+              dpi: int = 150,
+              ylim: Tuple[float, float] = (-0.05, 1.05),
+              xticks: str = 'year'):
+    """
+    画折线图
+
+    Parameters
+    ----------
+    series: pd.Series
+        时间序列
+    title : str
+        图片标题
+    fig_dir : str
+        图片保存文件夹路径，e.g. 'factor_analysis/report/figs'
+    fig_name : str
+        图片名称，e.g. 'line'
+    fig_size : Tuple[int, int], optional
+        图片大小，by default (16, 6)
+    dpi : int, optional
+        图片分辨率，by default 150
+    ylim : Tuple[float, float], optional
+        y轴范围，by default (-0.05, 1.05)
+    xticks : str, optional
+        x轴刻度频率，可选值为'year', 'month', 'day', by default 'year'
+    """
+    fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+    plt.plot(series)
+    plt.ylim(ylim)
+    plt.title(title)
+    if xticks in ['year', 'month']:
+        _set_xticks(ax, xticks)
+    plt.grid()
+    plt.tight_layout()
+    save_path = os.path.join(fig_dir, f'{fig_name}.svg')
+    plt.savefig(save_path)
+    plt.close()
+
+
+def plot_dist(series: pd.Series,
+              kde: bool = True,
+              fig_dir: str = None,
+              fig_name: str = None,
+              fig_size: Tuple[int, int] = (16, 6),
+              dpi: int = 150):
+    """画分布图
+
+    Parameters
+    ----------
+    series : pd.Series
+        值序列
+    kde : bool, optional
+        是否画核密度估计曲线, by default True
+    fig_dir : str, optional
+        图片保存文件夹路径，e.g. 'factor_analysis/report/figs', by default None
+    fig_name : str, optional
+        图片名称，e.g. 'dist', by default None
+    fig_size : Tuple[int, int], optional
+        图片大小，by default (16, 6)
+    dpi : int, optional
+        图片分辨率，by default 150
+    """
+    plt.figure(figsize=fig_size, dpi=dpi)
+    data = sns.histplot(series, kde=kde, stat='count')
+    data.set(ylabel='Density', title='Distribution after removing outliers')
+    plt.tight_layout()
+    plt.savefig(os.path.join(fig_dir, f'{fig_name}.svg'))
     plt.close()
 
 

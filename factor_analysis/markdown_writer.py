@@ -10,7 +10,6 @@ import os
 import asyncio
 import subprocess
 import markdown
-import winreg
 import pandas as pd
 from bs4 import BeautifulSoup
 from pyppeteer import launch
@@ -34,19 +33,37 @@ def get_chrome_executable_path():
                 if chrome_path:
                     return chrome_path
         except subprocess.CalledProcessError:
-            return None
+            pass
     elif os.name == 'nt':  # Windows
         # 尝试查找Chrome执行文件
-        CHROME_REG = r"SOFTWARE\Clients\StartMenuInternet\Google Chrome\DefaultIcon"
         try:
-            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, CHROME_REG)
-            value, _type = winreg.QueryValueEx(key, "")
-            return value.split(',')[0]
+            chrome_path = subprocess.check_output(['where',
+                                                   'chrome']).decode().strip()
+            if chrome_path:
+                return chrome_path
         except subprocess.CalledProcessError:
-            return None
+            pass
+
+    # 如果在上述系统中未找到Chrome执行文件，返回None
+    return None
 
 
 def markdown_to_html(markdown_path, html_template_path=None):
+    """
+    将markdown文件转换为html文件
+
+    Parameters
+    ----------
+    markdown_path : str
+        markdown文件路径
+    html_template_path : str, optional
+        html模板文件路径，默认为None
+
+    Returns
+    -------
+    html_path : str
+        html文件路径
+    """
     # 读取markdown文件
     with open(markdown_path, 'r', encoding='utf-8') as file:
         markdown_text = file.read()
@@ -70,13 +87,13 @@ def markdown_to_html(markdown_path, html_template_path=None):
 
 
 async def html_to_pdf(html_path, pdf_path):
-    browser = await launch(executablePath=get_chrome_executable_path())
+    browser = await launch()
     page = await browser.newPage()
 
     # Convert the local file path to URL format
     file_url = 'file://' + os.path.abspath(html_path)
 
-    await page.goto(file_url, waitUntil='networkidle2')
+    await page.goto(file_url, waitUntil='load', timeout=120000)
     await page.pdf(
         options={
             'path': pdf_path,
@@ -85,7 +102,8 @@ async def html_to_pdf(html_path, pdf_path):
                 'bottom': '1cm',
                 'left': '0.8cm',
                 'right': '0.8cm'
-            }
+            },
+            'printBackground': True,
         })
 
     await browser.close()
@@ -131,6 +149,8 @@ def get_relative_path(path_a: str, path_b: str) -> str:
         相对路径
     """
     common_prefix = os.path.commonprefix([path_a, path_b])
+    if not common_prefix.endswith("/"):
+        common_prefix = os.path.dirname(common_prefix)
     if common_prefix:
         relative_path = os.path.relpath(path_b, common_prefix)
     else:
@@ -210,7 +230,10 @@ class MarkdownWriter:
         with open(self.md_path, "a", encoding="utf-8") as f:
             f.write("#" * level + " " + title + "\n")
 
-    def add_table(self, df: pd.DataFrame, float_format: str = "%.4f"):
+    def add_table(self,
+                  df: pd.DataFrame,
+                  float_format: str = ".4f",
+                  index: bool = True):
         """
         添加表格
 
@@ -220,7 +243,8 @@ class MarkdownWriter:
             表格数据
         """
         with open(self.md_path, "a", encoding="utf-8") as f:
-            f.write(df.to_markdown(floatfmt=float_format) + "\n\n")
+            f.write(
+                df.to_markdown(floatfmt=float_format, index=index) + "\n\n")
 
     def add_image(self, image_name: str, image_path: str):
         """
@@ -296,7 +320,7 @@ class MarkdownWriter:
         添加分页符
         """
         with open(self.md_path, "a", encoding="utf-8") as f:
-            f.write("<div style=\"page-break-after: always;\"></div>\n\n")
+            f.write("<div style=\"page-break-after: always;\"></div>\n")
 
     def add_math(self, math: str):
         """

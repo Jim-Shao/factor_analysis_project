@@ -20,6 +20,8 @@ from tqdm import tqdm
 
 from factor_analysis.utils import assert_std_index
 
+DEFALT_MIN_PERIODS_RATIO = 0.5
+
 # ===========================================================
 # region 1. Base
 # ===========================================================
@@ -27,6 +29,7 @@ from factor_analysis.utils import assert_std_index
 
 class Operator(ABC):
     """运算符基类，后续的子类需要实现_apply方法"""
+
     def __init__(self):
         pass
 
@@ -75,24 +78,28 @@ class BinaryTsOperator(Operator):
 
 class Neg(UnaryOperator):
     """取负运算符"""
+
     def _apply(self, x: pd.Series) -> pd.Series:
         return -x
 
 
 class Abs(UnaryOperator):
     """取绝对值运算符"""
+
     def _apply(self, x: pd.Series) -> pd.Series:
         return x.abs()
 
 
 class Sign(UnaryOperator):
     """取符号运算符"""
+
     def _apply(self, x: pd.Series) -> pd.Series:
         return x.apply(lambda x: 1 if x > 0 else -1 if x < 0 else 0)
 
 
 class Log(UnaryOperator):
     """取对数运算符"""
+
     def _apply(self, x: pd.Series) -> pd.Series:
         return x.apply(lambda x: math.log(x) if x > 0 else 0)
 
@@ -106,6 +113,7 @@ class Log(UnaryOperator):
 
 class Sum(BinaryOperator):
     """求和运算符"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x + y
@@ -113,6 +121,7 @@ class Sum(BinaryOperator):
 
 class Diff(BinaryOperator):
     """求差运算符"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x - y
@@ -120,6 +129,7 @@ class Diff(BinaryOperator):
 
 class Mul(BinaryOperator):
     """求积运算符"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x * y
@@ -127,6 +137,7 @@ class Mul(BinaryOperator):
 
 class Div(BinaryOperator):
     """求商运算符"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x / y
@@ -134,6 +145,7 @@ class Div(BinaryOperator):
 
 class Power(BinaryOperator):
     """求幂运算符"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x**y
@@ -141,18 +153,21 @@ class Power(BinaryOperator):
 
 class Cov(BinaryOperator):
     """求协方差运算符"""
+
     def _apply(self, x: pd.Series, y: pd.Series) -> pd.Series:
         return x.cov(y)
 
 
 class Corr(BinaryOperator):
     """求相关系数运算符"""
+
     def _apply(self, x: pd.Series, y: pd.Series) -> pd.Series:
         return x.corr(y)
 
 
 class Equal(BinaryOperator):
     """判断一个序列与一个数值或者另一个序列是否相等"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x == y
@@ -160,6 +175,7 @@ class Equal(BinaryOperator):
 
 class Greater(BinaryOperator):
     """判断一个序列是否大于一个数值或者另一个序列"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x > y
@@ -167,6 +183,7 @@ class Greater(BinaryOperator):
 
 class Less(BinaryOperator):
     """判断一个序列是否小于一个数值或者另一个序列"""
+
     def _apply(self, x: pd.Series, y: Union[int, float,
                                             pd.Series]) -> pd.Series:
         return x < y
@@ -181,6 +198,7 @@ class Less(BinaryOperator):
 
 class Rank(CrossSectionalOperator):
     """横截面排序运算符"""
+
     def _apply(self, x: pd.Series) -> pd.Series:
         return x.groupby(level='datetime').rank()
 
@@ -194,6 +212,7 @@ class Rank(CrossSectionalOperator):
 
 class TsSum(TsOperator):
     """时序求窗口内和运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).sum().droplevel(0)
@@ -201,13 +220,23 @@ class TsSum(TsOperator):
 
 class TsMean(TsOperator):
     """时序求窗口内均值运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).mean().droplevel(0)
 
 
+class TsVar(TsOperator):
+    """时序求窗口内方差运算符"""
+
+    def _apply(self, x: pd.Series, window: int) -> pd.Series:
+        return x.groupby(
+            level='order_book_id').rolling(window).var().droplevel(0)
+
+
 class TsStd(TsOperator):
     """时序求窗口内标准差运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).std().droplevel(0)
@@ -215,6 +244,7 @@ class TsStd(TsOperator):
 
 class TsSkew(TsOperator):
     """时序求窗口内偏度运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).skew().droplevel(0)
@@ -222,6 +252,7 @@ class TsSkew(TsOperator):
 
 class TsKurt(TsOperator):
     """时序求窗口内峰度运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).kurt().droplevel(0)
@@ -229,6 +260,7 @@ class TsKurt(TsOperator):
 
 class TsMedian(TsOperator):
     """时序求窗口内中位数运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).median().droplevel(0)
@@ -236,6 +268,7 @@ class TsMedian(TsOperator):
 
 class TsMax(TsOperator):
     """时序求窗口内最大值运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).max().droplevel(0)
@@ -243,6 +276,7 @@ class TsMax(TsOperator):
 
 class TsMin(TsOperator):
     """时序求窗口内最小值运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(
             level='order_book_id').rolling(window).min().droplevel(0)
@@ -250,6 +284,7 @@ class TsMin(TsOperator):
 
 class TsArgmax(TsOperator):
     """时序求窗口内最大值索引运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(level='order_book_id').rolling(window).apply(
             lambda x: x.argmax()).droplevel(0)
@@ -257,6 +292,7 @@ class TsArgmax(TsOperator):
 
 class TsArgmin(TsOperator):
     """时序求窗口内最小值索引运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(level='order_book_id').rolling(window).apply(
             lambda x: x.argmin()).droplevel(0)
@@ -264,6 +300,7 @@ class TsArgmin(TsOperator):
 
 class TsRank(TsOperator):
     """时序求排序运算符"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(level='order_book_id').rolling(window).apply(
             lambda x: x.rank()[-1]).droplevel(0)
@@ -271,12 +308,14 @@ class TsRank(TsOperator):
 
 class TsDelay(TsOperator):
     """时序求延迟运算符，得到若干天前的数据"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(level='order_book_id').shift(window)
 
 
 class TsDelta(TsOperator):
     """时序求差分运算符，减去若干天前的数据"""
+
     def _apply(self, x: pd.Series, window: int) -> pd.Series:
         return x.groupby(level='order_book_id').diff(window)
 
@@ -288,11 +327,94 @@ class TsDelta(TsOperator):
 # ===========================================================
 
 
+def rolling_window(
+    array: np.array,
+    window: int,
+) -> np.array:
+    """对1d-array(shape:(n,))生成滚动窗口
+    生成的滚动窗口是2d-array(shape:(n-window+1,window))
+
+    Args:
+        array (np.array): 信号量数组 (shape:(n,))
+        window (int): 滚动期
+
+    Returns:
+        np.array: 滚动窗口 (shape:(n-window+1, window))
+    """
+    shape = array.shape[:-1] + (array.shape[-1] - window + 1, window)
+    strides = array.strides + (array.strides[-1], )
+    if len(array) >= window:
+        return np.lib.stride_tricks.as_strided(array,
+                                               shape=shape,
+                                               strides=strides)
+    else:
+        raise ValueError('无法对长度小于时间窗口长度的序列进行滚动窗口')
+
+
 class BinaryTsCorr(BinaryTsOperator):
     """两个时序求窗口内相关系数运算符"""
+
     def _apply(self, x: pd.Series, y: pd.Series, window: int) -> pd.Series:
-        return x.groupby(level='order_book_id').rolling(
-            window=window).apply(lambda x: x.corr(y)).droplevel(0)
+        def calc_rolling_corr(df: pd.DataFrame, window: int) -> np.ndarray:
+            """向量化计算corr来代替pandas的groupby.rolling.apply"""
+            array = np.concatenate(
+                [np.full((window - 1, 2), np.nan), df.values])
+            x = array[:, 0]
+            y = array[:, 1]
+            x = rolling_window(x, window)
+            y = rolling_window(y, window)
+            mean_x = x.mean(axis=1)
+            mean_y = y.mean(axis=1)
+            std_x = x.std(axis=1, ddof=1)
+            std_y = y.std(axis=1, ddof=1)
+            corr_array = np.sum(
+                (x - mean_x.reshape(-1, 1)) * (y - mean_y.reshape(-1, 1)),
+                axis=1) / ((window - 1) * std_x * std_y)
+            return corr_array
+
+        orignial_index = x.index
+        df = pd.concat([x, y], axis=1)
+        df = df.swaplevel('datetime', 'order_book_id').sort_index()
+        nested_corr_series = df.groupby(level='order_book_id').apply(
+            lambda df: calc_rolling_corr(df, window))
+        corr_values = np.concatenate(nested_corr_series.values)
+        corr_series = pd.Series(corr_values, index=df.index)
+        corr_series = corr_series.swaplevel('datetime',
+                                            'order_book_id').sort_index()
+        corr_series = corr_series.reindex(orignial_index)
+        return corr_series
+
+
+class BinaryTsCov(BinaryTsOperator):
+    """两个时序求窗口内协方差运算符"""
+
+    def _apply(self, x: pd.Series, y: pd.Series, window: int) -> pd.Series:
+        def calc_rolling_cov(df: pd.DataFrame, window: int) -> np.ndarray:
+            """向量化计算cov来代替pandas的groupby.rolling.apply"""
+            array = np.concatenate(
+                [np.full((window - 1, 2), np.nan), df.values])
+            x = array[:, 0]
+            y = array[:, 1]
+            x = rolling_window(x, window)
+            y = rolling_window(y, window)
+            mean_x = x.mean(axis=1)
+            mean_y = y.mean(axis=1)
+            cov_array = np.sum(
+                (x - mean_x.reshape(-1, 1)) * (y - mean_y.reshape(-1, 1)),
+                axis=1) / (window - 1)
+            return cov_array
+
+        orignial_index = x.index
+        df = pd.concat([x, y], axis=1)
+        df = df.swaplevel('datetime', 'order_book_id').sort_index()
+        nested_cov_series = df.groupby(level='order_book_id').apply(
+            lambda df: calc_rolling_cov(df, window))
+        cov_values = np.concatenate(nested_cov_series.values)
+        cov_series = pd.Series(cov_values, index=df.index)
+        cov_series = cov_series.swaplevel('datetime',
+                                          'order_book_id').sort_index()
+        cov_series = cov_series.reindex(orignial_index)
+        return cov_series
 
 
 # endregion==================================================
@@ -311,6 +433,8 @@ class TreeNode:
 
 class Expression:
     def __init__(self, expression: str) -> None:
+        assert expression[0] == '(' and expression[-1] == ')', \
+            '表达式需要以括号开始和结束'
         self.expression = re.sub(r'\s+', '', expression)  # 去除空格
         self.expression_tree = self.build_expression_tree()  # 构建表达式树
         self._operators = {
@@ -331,6 +455,7 @@ class Expression:
             'rank': Rank(),
             'ts_sum': TsSum(),
             'ts_mean': TsMean(),
+            'ts_var': TsVar(),
             'ts_std': TsStd(),
             'ts_skew': TsSkew(),
             'ts_kurt': TsKurt(),
@@ -343,6 +468,7 @@ class Expression:
             'ts_delay': TsDelay(),
             'ts_delta': TsDelta(),
             'ts_corr': BinaryTsCorr(),
+            'ts_cov': BinaryTsCov(),
         }
 
     def build_expression_tree(self):
@@ -394,9 +520,12 @@ class Expression:
             operator: Operator = self._operators[node.value]
         elif node.value in df.columns:
             return df[node.value]
+        elif node.value.isdigit():
+            return float(node.value)
         else:
             raise ValueError(
-                f'Unknown value <{node.value}>, not in operators or columns')
+                f'Unknown value <{node.value}>, not in operators or columns or digits'
+            )
 
         # 递归应用表达式树
         if isinstance(operator, CrossSectionalOperator):
@@ -510,7 +639,12 @@ class CalcPool:
             进程队列，用于记录进程id, by default None
         """
         expr = Expression(expression)
-        factor = expr.apply_to_df(name_space.df).values
+        # import time
+        # start_time = time.time()
+        factor = expr.apply_to_df(name_space.df).reindex(self.index).values
+        # end_time = time.time()
+        # print(
+        #     f'calc factor {factor_name} cost {end_time - start_time} seconds')
         if not len(factor) == self.index_len:
             raise ValueError(
                 f'factor length {len(factor)} != index length {self.index_len}'
@@ -566,28 +700,30 @@ if __name__ == '__main__':
     from factor_analysis.utils import generate_stock_df
     from time import time
 
-    df = generate_stock_df()
+    df = generate_stock_df(n_stocks=30)
     expression1 = '(open)'
-    expression2 = '(high)'
-    expression3 = '(low)'
-    expression4 = '(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))'
-    expression5 = '(rank(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6)))'
-    expression6 = '(neg(rank(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))))'
+    expression2 = '(neg(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6)))'
+    expression3 = '(rank(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6)))'
+    expression4 = '(neg(rank(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))))'
+    expression5 = '(neg(neg(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6))))'
+    expression6 = '(neg(neg(neg(ts_corr(rank(ts_delta(log(volume), 2)), rank(div(diff(close, open), open)), 6)))))'
     expressions = [
         expression1, expression2, expression3, expression4, expression5,
         expression6
-    ] * 2
+    ]
 
-    # start = time()
-    # n_jobs = 1
-    # pool = CalcPool(df, expressions, n_jobs=n_jobs)
-    # factors = pool.calc_factors()
-    # end = time()
-    # print(factors)
-    # print(f'不使用多进程逐个计算耗时：{end - start}s')
-
+    # 不使用多进程，逐个计算：19.85141658782959s
     start = time()
-    n_jobs = 6
+    n_jobs = 1
+    pool = CalcPool(df, expressions, n_jobs=n_jobs)
+    factors = pool.calc_factors()
+    end = time()
+    print(factors)
+    print(f'不使用多进程逐个计算耗时：{end - start}s')
+
+    # 使用多进程计算：3.842790126800537s
+    start = time()
+    n_jobs = 3
     pool = CalcPool(df, expressions, n_jobs=n_jobs)
     factors = pool.calc_factors()
     end = time()

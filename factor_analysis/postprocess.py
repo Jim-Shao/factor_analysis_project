@@ -36,8 +36,8 @@ def winsorize_series_mad(
     """
     median = series.median()
     mad = (series - median).abs().median()
-    top = median + n * mad
-    bottom = median - n * mad
+    top = median + n * 1.4826 * mad
+    bottom = median - n * 1.4826 * mad
     series[series > top] = top
     series[series < bottom] = bottom
     return series
@@ -165,7 +165,7 @@ def winsorize_df(
     """
     assert_std_index(df, 'df', 'df')
     for col in df.columns:
-        df[col] = winsorize_series(df[col], method, n, lower, upper)
+        df.loc[:, col] = winsorize_series(df[col], method, n, lower, upper)
     return df
 
 
@@ -302,6 +302,7 @@ class Postprocess:
             - 'mad': 使用中位数绝对偏差去极值
             - 'std': 使用标准差去极值
             - 'pct': 使用百分位数去极值
+
         n : float, optional, used when method is 'mad' or 'std'
             中位数绝对偏差或标准差的倍数，当method为'mad'或'std'时使用, by default 3.
         lower : float, optional, used when method is 'pct'
@@ -483,19 +484,6 @@ class PostprocessQueue:
     def __init__(self):
         self.queue: List[partial] = []
 
-    def add_step(self, postprocess_func: Callable, **kwargs) -> None:
-        """
-        添加后处理步骤。
-
-        Parameters
-        ----------
-        postprocess_func : Callable
-            后处理函数。
-        kwargs : dict
-            后处理函数的参数。
-        """
-        self.queue.append(partial(postprocess_func, **kwargs))
-
     def __call__(
         self,
         factor: Union[pd.Series, pd.DataFrame],
@@ -517,6 +505,26 @@ class PostprocessQueue:
         for func in self.queue:
             factor = func(factor)
         return factor
+
+    @property
+    def info(self):
+        if self.queue:
+            return ' -> '.join([func.func.__name__ for func in self.queue])
+        else:
+            return 'None'
+
+    def add_step(self, postprocess_func: Callable, **kwargs) -> None:
+        """
+        添加后处理步骤。
+
+        Parameters
+        ----------
+        postprocess_func : Callable
+            后处理函数。
+        kwargs : dict
+            后处理函数的参数。
+        """
+        self.queue.append(partial(postprocess_func, **kwargs))
 
 
 if __name__ == '__main__':
@@ -544,3 +552,5 @@ if __name__ == '__main__':
     postprocess_queue.add_step(Postprocess.standardize)
     factor = postprocess_queue(factor_df)
     print(factor)
+
+    print(postprocess_queue.info)
