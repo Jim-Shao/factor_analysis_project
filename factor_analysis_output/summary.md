@@ -1,6 +1,9 @@
 # 因子分析报告
+
 ## RandomGenerated1，3个因子
+
 ### RankIC比较，根据(T=20,IR)降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -75,7 +78,9 @@
   </tbody>
 </table>
 ### 因子(T=20)收益比较，根据sharpe降序
+
 #### 多空组合
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -134,6 +139,7 @@
 ![RandomGenerated1多空组合对数收益率](RandomGenerated1_long_short.svg)
 
 #### 多头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -192,6 +198,7 @@
 ![RandomGenerated1多头超额对数收益率](RandomGenerated1_long_excess.svg)
 
 #### 空头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -250,6 +257,7 @@
 ![RandomGenerated1空头超额对数收益率](RandomGenerated1_short_excess.svg)
 
 ### 单因子策略收益比较，根据sharpe降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -312,14 +320,21 @@
 ![RandomGenerated1单因子策略对数收益率](RandomGenerated1_quantile_log_return.svg)
 
 <div style="page-break-after: always;"></div>
+
 ### 因子相关性热力图
+
 ![RandomGenerated1因子相关性](RandomGenerated1/factor_corr.svg)
 
 ### 因子等权组合优化
+
 #### 没有找到优化因子
+
 <div style="page-break-after: always;"></div>
+
 ## RandomGenerated2，3个因子
+
 ### RankIC比较，根据(T=20,IR)降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -394,7 +409,9 @@
   </tbody>
 </table>
 ### 因子(T=20)收益比较，根据sharpe降序
+
 #### 多空组合
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -453,6 +470,7 @@
 ![RandomGenerated2多空组合对数收益率](RandomGenerated2_long_short.svg)
 
 #### 多头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -511,6 +529,7 @@
 ![RandomGenerated2多头超额对数收益率](RandomGenerated2_long_excess.svg)
 
 #### 空头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -569,6 +588,7 @@
 ![RandomGenerated2空头超额对数收益率](RandomGenerated2_short_excess.svg)
 
 ### 单因子策略收益比较，根据sharpe降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -631,14 +651,21 @@
 ![RandomGenerated2单因子策略对数收益率](RandomGenerated2_quantile_log_return.svg)
 
 <div style="page-break-after: always;"></div>
+
 ### 因子相关性热力图
+
 ![RandomGenerated2因子相关性](RandomGenerated2/factor_corr.svg)
 
 ### 因子等权组合优化
+
 #### 没有找到优化因子
+
 <div style="page-break-after: always;"></div>
+
 ## factor1，2个选股池
+
 ### RankIC比较，根据(T=20,IR)降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -698,7 +725,9 @@
   </tbody>
 </table>
 ### 因子(T=20)收益比较，根据sharpe降序
+
 #### 多空组合
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -746,6 +775,7 @@
 ![factor1多空组合对数收益率](factor1_long_short.svg)
 
 #### 多头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -793,6 +823,7 @@
 ![factor1多头超额对数收益率](factor1_long_excess.svg)
 
 #### 空头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -840,6 +871,7 @@
 ![factor1空头超额对数收益率](factor1_short_excess.svg)
 
 ### 单因子策略收益比较，根据sharpe降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -890,8 +922,11 @@
 ![factor1单因子策略对数收益率](factor1_quantile_log_return.svg)
 
 <div style="page-break-after: always;"></div>
+
 ## factor2，2个选股池
+
 ### RankIC比较，根据(T=20,IR)降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -951,7 +986,9 @@
   </tbody>
 </table>
 ### 因子(T=20)收益比较，根据sharpe降序
+
 #### 多空组合
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -999,6 +1036,7 @@
 ![factor2多空组合对数收益率](factor2_long_short.svg)
 
 #### 多头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1046,6 +1084,7 @@
 ![factor2多头超额对数收益率](factor2_long_excess.svg)
 
 #### 空头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1093,6 +1132,7 @@
 ![factor2空头超额对数收益率](factor2_short_excess.svg)
 
 ### 单因子策略收益比较，根据sharpe降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1143,8 +1183,11 @@
 ![factor2单因子策略对数收益率](factor2_quantile_log_return.svg)
 
 <div style="page-break-after: always;"></div>
+
 ## open，2个选股池
+
 ### RankIC比较，根据(T=20,IR)降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1204,7 +1247,9 @@
   </tbody>
 </table>
 ### 因子(T=20)收益比较，根据sharpe降序
+
 #### 多空组合
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1252,6 +1297,7 @@
 ![open多空组合对数收益率](open_long_short.svg)
 
 #### 多头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1299,6 +1345,7 @@
 ![open多头超额对数收益率](open_long_excess.svg)
 
 #### 空头超额
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1346,6 +1393,7 @@
 ![open空头超额对数收益率](open_short_excess.svg)
 
 ### 单因子策略收益比较，根据sharpe降序
+
 <table border="1" class="dataframe">
   <thead>
     <tr>
@@ -1396,3 +1444,4 @@
 ![open单因子策略对数收益率](open_quantile_log_return.svg)
 
 <div style="page-break-after: always;"></div>
+

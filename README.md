@@ -1,14 +1,16 @@
 # factor_analysis 因子回测报告生成工具
 
 ## 1. 介绍
-该工具用于生成markdown与pdf格式的因子回测报告
+该工具用于生成markdown, html, pdf三种格式的因子回测报告
 
 - 单因子报告示例
     - markdown格式的报告示例：[./factor_analysis_output/RandomGenerated1/factor1/factor1_report.md](./factor_analysis_output/RandomGenerated1/factor1/factor1_report.md)
+    - html格式的报告示例：[./factor_analysis_output/RandomGenerated1/factor1/factor1_report.html](./factor_analysis_output/RandomGenerated1/factor1/factor1_report.html)
     - pdf格式的报告示例：[./factor_analysis_output/RandomGenerated1/factor1/factor1_report.pdf](./factor_analysis_output/RandomGenerated1/factor1/factor1_report.pdf)
 
 - 多因子报告示例
     - markdown格式的报告示例：[./factor_analysis_output/summary.md](./factor_analysis_output/summary.md)
+    - html格式的报告示例：[./factor_analysis_output/summary.html](./factor_analysis_output/summary.html)
     - pdf格式的报告示例：[./factor_analysis_output/summary.pdf](./factor_analysis_output/summary.pdf)
 
 

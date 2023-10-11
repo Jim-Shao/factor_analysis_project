@@ -1,5 +1,7 @@
 # factor1(RandomGenerated2) 因子报告
+
 ## 因子值分布（已去极值）
+
 ![因子值分布](factor_dist.svg)
 
 |   n_valid |   n_nan |   n_outlier |   mean |    std |     min |     25% |     50% |    75% |    max |
@@ -7,11 +9,15 @@
 |      1910 |      90 |           0 | 0.0000 | 0.9489 | -2.2355 | -0.7507 | -0.0032 | 0.7249 | 2.2486 |
 
 ## 因子值非空比例
+
 ![因子值非空比例](factor_non_nan_ratio.svg)
 
 <div style="page-break-after: always;"></div>
+
 ## IC分析
+
 ### 1D
+
 ![IC分布](IC/factor1_1D.svg)
 
 | IC   |   total |   2010 |
@@ -29,7 +35,9 @@
 | IR       |  0.0827 | 0.0827 |
 
 <div style="page-break-after: always;"></div>
+
 ### 5D
+
 ![IC分布](IC/factor1_5D.svg)
 
 | IC   |   total |   2010 |
@@ -47,7 +55,9 @@
 | IR       |  0.1055 | 0.1055 |
 
 <div style="page-break-after: always;"></div>
+
 ### 10D
+
 ![IC分布](IC/factor1_10D.svg)
 
 | IC   |   total |   2010 |
@@ -65,7 +75,9 @@
 | IR       |  0.0709 | 0.0709 |
 
 <div style="page-break-after: always;"></div>
+
 ### 20D
+
 ![IC分布](IC/factor1_20D.svg)
 
 | IC   |   total |   2010 |
@@ -83,8 +95,11 @@
 | IR       |  0.0173 | 0.0173 |
 
 <div style="page-break-after: always;"></div>
+
 ## 收益分析
+
 ### 1D
+
 ![分层净值](net_value/factor1_1D.svg)
 
 ![累计对数收益率](net_value/factor1_1D_log_return.svg)
@@ -101,7 +116,9 @@
 | long_short     |    0.6371 |   0.6015 |   0.9910 |   1.0591 |     0.5000 |    0.9287 |        0.0514 |        -0.0445 |           1.1535 |
 
 <div style="page-break-after: always;"></div>
+
 ### 5D
+
 ![分层净值](net_value/factor1_5D.svg)
 
 ![累计对数收益率](net_value/factor1_5D_log_return.svg)
@@ -118,7 +135,9 @@
 | long_short     |    3.1019 |   0.3816 |   2.0593 |   8.1278 |     0.5291 |    0.8693 |        0.0484 |        -0.0397 |           1.2179 |
 
 <div style="page-break-after: always;"></div>
+
 ### 10D
+
 ![分层净值](net_value/factor1_10D.svg)
 
 ![累计对数收益率](net_value/factor1_10D_log_return.svg)
@@ -135,7 +154,9 @@
 | long_short     |    2.4432 |   0.4795 |   1.9209 |   5.0957 |     0.5556 |    0.8199 |        0.0429 |        -0.0401 |           1.0710 |
 
 <div style="page-break-after: always;"></div>
+
 ### 20D
+
 ![分层净值](net_value/factor1_20D.svg)
 
 ![累计对数收益率](net_value/factor1_20D_log_return.svg)
@@ -152,7 +173,9 @@
 | long_short     |    2.4903 |   0.3852 |   1.9083 |   6.4643 |     0.5363 |    0.8403 |        0.0458 |        -0.0397 |           1.1532 |
 
 <div style="page-break-after: always;"></div>
+
 ### 因子加权日频收益
+
 ![因子加权净值](net_value/factor1_factor_weighted.svg)
 
 ![因子加权累计对数收益率](net_value/factor1_factor_weighted_log_return.svg)
@@ -166,7 +189,9 @@
 | excess          |   -0.5042 |   0.5243 |  -1.1564 |  -0.9617 |     0.4804 |    0.4986 |        0.0243 |        -0.0269 |           0.9043 |
 
 <div style="page-break-after: always;"></div>
+
 ### 单因子策略(0.8, 1.0)收益
+
 ![单因子策略(0.8, 1.0)净值](net_value/factor1_quantile.svg)
 
 ![单因子策略(0.8, 1.0)累计对数收益率](net_value/factor1_quantile_log_return.svg)
@@ -180,8 +205,11 @@
 | excess    |   -0.4550 |   0.5737 |  -0.7093 |  -0.7931 |     0.4749 |    0.6011 |        0.0301 |        -0.0304 |           0.9887 |
 
 <div style="page-break-after: always;"></div>
+
 ## 换手率分析
+
 ### 1D
+
 ![分层换手率分布](turnover/factor1_1D_group.svg)
 
 |         |   turnover_count |   turnover_mean |   turnover_std |
@@ -193,7 +221,9 @@
 | group_5 |         185.0000 |          0.7919 |         0.2471 |
 
 <div style="page-break-after: always;"></div>
+
 ### 5D
+
 ![分层换手率分布](turnover/factor1_5D_group.svg)
 
 |         |   turnover_count |   turnover_mean |   turnover_std |
@@ -205,7 +235,9 @@
 | group_5 |          36.0000 |          0.7778 |         0.2520 |
 
 <div style="page-break-after: always;"></div>
+
 ### 10D
+
 ![分层换手率分布](turnover/factor1_10D_group.svg)
 
 |         |   turnover_count |   turnover_mean |   turnover_std |
@@ -217,7 +249,9 @@
 | group_5 |          16.0000 |          0.8438 |         0.2394 |
 
 <div style="page-break-after: always;"></div>
+
 ### 20D
+
 ![分层换手率分布](turnover/factor1_20D_group.svg)
 
 |         |   turnover_count |   turnover_mean |   turnover_std |
@@ -229,7 +263,9 @@
 | group_5 |           7.0000 |          0.7857 |         0.2673 |
 
 <div style="page-break-after: always;"></div>
+
 ### 因子加权持仓换手率
+
 ![因子加权持仓换手率](turnover/factor1_factor_weighted.svg)
 
 |                 |   turnover_count |   turnover_mean |   turnover_std |
@@ -237,6 +273,7 @@
 | factor_weighted |           9.0000 |          0.7740 |         0.1894 |
 
 ### 单因子策略(0.8, 1.0)换手率
+
 ![单因子策略(0.8, 1.0)换手率](turnover/factor1_quantile.svg)
 
 |          |   turnover_count |   turnover_mean |   turnover_std |
@@ -244,3 +281,4 @@
 | strategy |           9.0000 |          0.9042 |         0.2334 |
 
 <div style="page-break-after: always;"></div>
+
